@@ -19,4 +19,5 @@ def run2url(run, num):
 		url = base + run[0:6] + '/00' + run[-1] + '/' + run + '/' + run + '_' + num + '.fastq.gz'
 	else:
 		url = base + run[0:6] + '/' + run + "/" + run + '_' + num + '.fastq.gz'
+	url = 'ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR598/ERR598959/ERR598959_1.fastq.gz'
 	return url

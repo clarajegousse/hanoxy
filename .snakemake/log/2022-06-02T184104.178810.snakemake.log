@@ -1,4 +1,0 @@
-UnboundLocalError in line 33 of /Users/jegoussc/Repositories/hanoxy/Snakefile:
-local variable 'r' referenced before assignment
-  File "/Users/jegoussc/Repositories/hanoxy/Snakefile", line 33, in <module>
-  File "/Users/jegoussc/Repositories/hanoxy/helpers.py", line 17, in run2url

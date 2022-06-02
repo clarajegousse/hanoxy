@@ -1,3 +1,0 @@
-NameError in line 32 of /Users/jegoussc/Repositories/hanoxy/Snakefile:
-name 'SCRATCHDIR' is not defined
-  File "/Users/jegoussc/Repositories/hanoxy/Snakefile", line 32, in <module>
