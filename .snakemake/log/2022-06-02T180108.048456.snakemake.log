@@ -1,0 +1,34 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 1 (use --cores to define parallelism)
+Rules claiming more threads will be scaled down.
+Job stats:
+job             count    min threads    max threads
+------------  -------  -------------  -------------
+all                 1              1              1
+download_ena        4              1              1
+total               5              1              1
+
+Select jobs to execute...
+
+[Thu Jun  2 18:01:08 2022]
+rule download_ena:
+    output: data/test/ERR3589576_2.fastq.gz
+    jobid: 2
+    wildcards: run=ERR3589576, num=2
+    resources: tmpdir=/var/folders/61/5z2dc0b92ws6z4fr57kvflvwr4qw9n/T
+
+[Thu Jun  2 18:01:08 2022]
+Error in rule download_ena:
+    jobid: 2
+    output: data/test/ERR3589576_2.fastq.gz
+    shell:
+        
+     echo ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR3589576/ERR3589576/ERR35895762.fastq.gz
+     touch test/
+     
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Shutting down, this might take some time.
+Exiting because a job execution failed. Look above for error message
+Complete log: .snakemake/log/2022-06-02T180108.048456.snakemake.log

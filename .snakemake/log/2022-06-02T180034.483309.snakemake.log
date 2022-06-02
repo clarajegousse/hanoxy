@@ -1,0 +1,3 @@
+NameError in line 33 of /Users/jegoussc/Repositories/hanoxy/Snakefile:
+name 'wildcards' is not defined
+  File "/Users/jegoussc/Repositories/hanoxy/Snakefile", line 33, in <module>

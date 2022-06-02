@@ -1,0 +1,75 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 1 (use --cores to define parallelism)
+Rules claiming more threads will be scaled down.
+Job stats:
+job               count    min threads    max threads
+--------------  -------  -------------  -------------
+all                   1              1              1
+compress_fastq        4              1              1
+total                 5              1              1
+
+Select jobs to execute...
+
+[Thu Jun  2 17:51:48 2022]
+rule compress_fastq:
+    input: data/raw/ERR3589576_1.fastq
+    output: data/raw/ERR3589576_1.fastq.gz
+    jobid: 1
+    wildcards: run=ERR3589576, num=1
+    resources: tmpdir=/var/folders/61/5z2dc0b92ws6z4fr57kvflvwr4qw9n/T
+
+[Thu Jun  2 17:51:48 2022]
+Finished job 1.
+1 of 5 steps (20%) done
+Select jobs to execute...
+
+[Thu Jun  2 17:51:48 2022]
+rule compress_fastq:
+    input: data/raw/ERR598959_2.fastq
+    output: data/raw/ERR598959_2.fastq.gz
+    jobid: 4
+    wildcards: run=ERR598959, num=2
+    resources: tmpdir=/var/folders/61/5z2dc0b92ws6z4fr57kvflvwr4qw9n/T
+
+[Thu Jun  2 17:51:48 2022]
+Finished job 4.
+2 of 5 steps (40%) done
+Select jobs to execute...
+
+[Thu Jun  2 17:51:48 2022]
+rule compress_fastq:
+    input: data/raw/ERR3589576_2.fastq
+    output: data/raw/ERR3589576_2.fastq.gz
+    jobid: 2
+    wildcards: run=ERR3589576, num=2
+    resources: tmpdir=/var/folders/61/5z2dc0b92ws6z4fr57kvflvwr4qw9n/T
+
+[Thu Jun  2 17:51:48 2022]
+Finished job 2.
+3 of 5 steps (60%) done
+Select jobs to execute...
+
+[Thu Jun  2 17:51:48 2022]
+rule compress_fastq:
+    input: data/raw/ERR598959_1.fastq
+    output: data/raw/ERR598959_1.fastq.gz
+    jobid: 3
+    wildcards: run=ERR598959, num=1
+    resources: tmpdir=/var/folders/61/5z2dc0b92ws6z4fr57kvflvwr4qw9n/T
+
+[Thu Jun  2 17:51:48 2022]
+Finished job 3.
+4 of 5 steps (80%) done
+Select jobs to execute...
+
+[Thu Jun  2 17:51:48 2022]
+localrule all:
+    input: data/raw/ERR3589576_1.fastq.gz, data/raw/ERR3589576_2.fastq.gz, data/raw/ERR598959_1.fastq.gz, data/raw/ERR598959_2.fastq.gz
+    jobid: 0
+    resources: tmpdir=/var/folders/61/5z2dc0b92ws6z4fr57kvflvwr4qw9n/T
+
+[Thu Jun  2 17:51:48 2022]
+Finished job 0.
+5 of 5 steps (100%) done
+Complete log: .snakemake/log/2022-06-02T175148.079548.snakemake.log

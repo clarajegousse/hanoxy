@@ -1,0 +1,5 @@
+Building DAG of jobs...
+MissingInputException in line 3 of /Users/jegoussc/Repositories/hanoxy/Snakefile:
+Missing input files for rule all:
+    affected files:
+        data/raw/ERR3589576_2.fastq.gz

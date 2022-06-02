@@ -1,0 +1,27 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 1 (use --cores to define parallelism)
+Rules claiming more threads will be scaled down.
+Job stats:
+job             count    min threads    max threads
+------------  -------  -------------  -------------
+all                 1              1              1
+download_ena        4              1              1
+total               5              1              1
+
+Select jobs to execute...
+
+[Thu Jun  2 18:05:33 2022]
+rule download_ena:
+    output: data/test/ERR3589576_2.fastq.gz
+    jobid: 2
+    wildcards: run=ERR3589576, num=2
+    resources: tmpdir=/var/folders/61/5z2dc0b92ws6z4fr57kvflvwr4qw9n/T
+
+Waiting at most 5 seconds for missing files.
+MissingOutputException in line 31 of /Users/jegoussc/Repositories/hanoxy/Snakefile:
+Job Missing files after 5 seconds. This might be due to filesystem latency. If that is the case, consider to increase the wait time with --latency-wait:
+data/test/ERR3589576_2.fastq.gz completed successfully, but some output files are missing. 2
+Shutting down, this might take some time.
+Exiting because a job execution failed. Look above for error message
+Complete log: .snakemake/log/2022-06-02T180533.617245.snakemake.log

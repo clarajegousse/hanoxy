@@ -1,0 +1,49 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 1 (use --cores to define parallelism)
+Rules claiming more threads will be scaled down.
+Job stats:
+job                 count    min threads    max threads
+----------------  -------  -------------  -------------
+all                     1              1              1
+decompress_fastq        2              1              1
+total                   3              1              1
+
+Select jobs to execute...
+
+[Thu Jun  2 17:40:15 2022]
+rule decompress_fastq:
+    input: data/raw/ERR3589576_1.fastq.gz
+    output: data/raw/ERR3589576_1.fastq
+    jobid: 1
+    wildcards: num=1
+    resources: tmpdir=/var/folders/61/5z2dc0b92ws6z4fr57kvflvwr4qw9n/T
+
+[Thu Jun  2 17:40:15 2022]
+Finished job 1.
+1 of 3 steps (33%) done
+Select jobs to execute...
+
+[Thu Jun  2 17:40:15 2022]
+rule decompress_fastq:
+    input: data/raw/ERR3589576_2.fastq.gz
+    output: data/raw/ERR3589576_2.fastq
+    jobid: 2
+    wildcards: num=2
+    resources: tmpdir=/var/folders/61/5z2dc0b92ws6z4fr57kvflvwr4qw9n/T
+
+[Thu Jun  2 17:40:15 2022]
+Finished job 2.
+2 of 3 steps (67%) done
+Select jobs to execute...
+
+[Thu Jun  2 17:40:15 2022]
+localrule all:
+    input: data/raw/ERR3589576_1.fastq, data/raw/ERR3589576_2.fastq
+    jobid: 0
+    resources: tmpdir=/var/folders/61/5z2dc0b92ws6z4fr57kvflvwr4qw9n/T
+
+[Thu Jun  2 17:40:15 2022]
+Finished job 0.
+3 of 3 steps (100%) done
+Complete log: .snakemake/log/2022-06-02T174013.344768.snakemake.log
