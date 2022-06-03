@@ -22,3 +22,19 @@ def run2url(wildcards):
 	else:
 		url = base + run[0:6] + '/' + run + "/" + run + '_' + num + '.fastq.gz'
 	return url
+
+def ui_config(sample, runs, raw_data_dir):
+	filename = 'sample_%s.txt' %sample
+	with open(filename, 'w') as f:
+		header = 'sample' + '\t' + 'r1' + '\t' + 'r2' + '\n'
+		paths_to_r1 = []
+		paths_to_r2 = []
+		#print(header)
+		f.write(header)
+		for r in runs:
+			paths_to_r1.append(raw_data_dir + '/' + r + '_1.fastq.gz')
+			paths_to_r2.append(raw_data_dir + '/' + r + '_2.fastq.gz')
+		sample_info = sample + '\t' + ','.join(paths_to_r1) + '\t' + ','.join(paths_to_r2)
+		#print(sample_info)
+		f.write(sample_info)
+	return filename
