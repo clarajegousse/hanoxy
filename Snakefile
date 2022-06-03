@@ -51,9 +51,7 @@ rule qc_ini:
         outdir = QC_RES_DIR,
         sample = SAMPLE
     output:
-        r1 = '{qc_res_dir}/{sample}-QUALITY_PASSED_R1.fastq.gz',
-        r2 = '{qc_res_dir}/{sample}-QUALITY_PASSED_R2.fastq.gz',
-        stats = '{qc_res_dir}/{sample}-STATS'
+        '{qc_res_dir}/{sample}-QUALITY_PASSED_R{num}.fastq.gz',
     shell:
         """
         iu-gen-configs {params.info} -o {params.outdir}
