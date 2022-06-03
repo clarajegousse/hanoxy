@@ -1,0 +1,14 @@
+--2022-06-03 12:33:21--  ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR315/ERR315862/ERR315862_2.fastq.gz
+           => ‘ERR315862_2.fastq.gz.1’
+Resolving ftp.sra.ebi.ac.uk (ftp.sra.ebi.ac.uk)... 193.62.193.138
+Connecting to ftp.sra.ebi.ac.uk (ftp.sra.ebi.ac.uk)|193.62.193.138|:21... connected.
+Logging in as anonymous ... Logged in!
+==> SYST ... done.    ==> PWD ... done.
+==> TYPE I ... done.  ==> CWD (1) /vol1/fastq/ERR315/ERR315862 ... done.
+==> SIZE ERR315862_2.fastq.gz ... 12853660065
+==> PASV ... done.    ==> RETR ERR315862_2.fastq.gz ... done.
+Length: 12853660065 (12G) (unauthoritative)
+
+
+
+2022-06-03 13:09:09 (4.97 MB/s) - Data connection: Operation timed out; 
