@@ -1,12 +1,19 @@
 import helpers as hlp
 
+configfile: "config.yaml"
+FILE = config['scratch_dir'] + config['samples_file_info']
 
-RUNS = ['ERR598959']
+SAMPLE = 'TARA_030'
+RUNS = hlp.sample2runs(SAMPLE, FILE)
+print(RUNS)
+#RUNS = ['ERR599054', 'ERR599158']
 NUM = ['1', '2']
+
 
 rule all:
     input:
-        expand("data/raw/{run}_{num}.fastq.gz", run = RUNS, num = NUM)
+        expand("{dir}/{run}_{num}.fastq.gz", dir = 'data/raw', run = RUNS, num = NUM)
+        #"data/raw/{run}_{num}.fastq.gz"
 
 # rule compress_fastq:
 #     input:
@@ -30,12 +37,13 @@ rule all:
 
 rule download_ena:
     params:
-        ftp = hlp.run2url('{wildcards.run}', '{wildcards.num}'),
+        ftp = lambda wc: hlp.run2url(wc),
         outdir = 'data/raw'
     output:
         "data/raw/{run}_{num}.fastq.gz"
     shell:
      """
+     echo {params.ftp}
      cd {params.outdir}
      wget {params.ftp}
      """
