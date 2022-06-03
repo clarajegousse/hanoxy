@@ -33,18 +33,21 @@ rule all:
 rule download_ena:
     params:
         ftp = lambda wildcard: hlp.run2url(wildcard),
-        outdir = RAW_DATA_DIR
+        outdir = '{raw_dir}/{sample}'
     output:
+        # /users/home/cat3/projects/hanoxy/data/raw/TARA_030/ERR315862_1.fastq.gz
         '{raw_dir}/{sample}/{run}_{num}.fastq.gz'
     shell:
      """
      echo {params.ftp}
+     mkdir -p {params.outdir}
      cd {params.outdir}
      wget {params.ftp}
      """
 
 rule qc_ini:
     input:
+        # /users/home/cat3/projects/hanoxy/data/raw/TARA_030/ERR315862_1.fastq.gz
         '{raw_dir}/{sample}/{run}_{num}.fastq.gz'
     params:
         info = hlp.ui_config(SAMPLE, RUNS, RAW_DATA_DIR),
