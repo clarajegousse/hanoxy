@@ -7,7 +7,7 @@ FILE = config['scratch_dir'] + config['samples_file_info']
 RAW_DATA_DIR = config['scratch_dir'] + config['raw_data_dir']
 QC_RES_DIR = config['scratch_dir'] + config['qc_res_dir']
 
-SAMPLE = 'TARA_030'
+SAMPLE = 'TARA_031'
 RUNS = hlp.sample2runs(SAMPLE, FILE)
 NUM = ['1', '2']
 
@@ -15,7 +15,8 @@ rule all:
     input:
         expand('{raw_dir}/{sample}/{run}_{num}.fastq.gz', raw_dir = RAW_DATA_DIR, sample = SAMPLE, run = RUNS, num = NUM),
         expand('{qc_res_dir}/{sample}.ini', qc_res_dir = QC_RES_DIR, sample = SAMPLE),
-        expand('{qc_res_dir}/{sample}-QUALITY_PASSED_R{num}.fastq', qc_res_dir = QC_RES_DIR, sample = SAMPLE, num = NUM)
+        expand('{qc_res_dir}/{sample}-QUALITY_PASSED_R{num}.fastq', qc_res_dir = QC_RES_DIR, sample = SAMPLE, num = NUM),
+        expand('{qc_res_dir}/{sample}-QUALITY_PASSED_R{num}.fastq.gz', qc_res_dir = QC_RES_DIR, sample = SAMPLE, num = NUM)
 
 rule download_ena:
     params:
@@ -51,3 +52,11 @@ rule qc_minoche:
         expand('{qc_res_dir}/{sample}-QUALITY_PASSED_R{num}.fastq', qc_res_dir = QC_RES_DIR, sample = SAMPLE, num = NUM)
     shell:
         'iu-filter-quality-minoche {input} --ignore-deflines'
+
+rule compress:
+    input:
+        expand('{qc_res_dir}/{sample}-QUALITY_PASSED_R{num}.fastq', qc_res_dir = QC_RES_DIR, sample = SAMPLE, num = NUM)
+    output:
+        expand('{qc_res_dir}/{sample}-QUALITY_PASSED_R{num}.fastq.gz', qc_res_dir = QC_RES_DIR, sample = SAMPLE, num = NUM)
+    shell:
+        'gzip {input}'
