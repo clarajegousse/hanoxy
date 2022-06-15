@@ -1,6 +1,5 @@
-scratch_dir: '/Users/jegoussc/Repositories/hanoxy'
-#scratch_dir: '/users/home/cat3/projects/hanoxy'
-
+#scratch_dir: '/Users/jegoussc/Repositories/hanoxy'
+scratch_dir: '/users/home/cat3/projects/hanoxy'
 samples_file_info: '/data/info/samples.txt'
 raw_data_dir: '/data/raw'
 qc_res_dir: '/results/qc'
