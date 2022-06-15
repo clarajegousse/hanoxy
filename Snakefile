@@ -13,7 +13,8 @@ NUM = ['1', '2']
 
 rule all:
     input:
-        expand('{raw_dir}/{sample}/{run}_{num}.fastq.gz', raw_dir = RAW_DATA_DIR, sample = SAMPLE, run = RUNS, num = NUM)
+        #expand('{raw_dir}/{sample}/{run}_{num}.fastq.gz', raw_dir = RAW_DATA_DIR, sample = SAMPLE, run = RUNS, num = NUM)
+        expand('{qc_res_dir}/{sample}.ini', qc_res_dir = QC_RES_DIR, sample = SAMPLE)
 
 
 rule download_ena:
@@ -30,3 +31,15 @@ rule download_ena:
      cd {params.outdir}
      wget {params.ftp}
      """
+
+rule qc_ini:
+    input:
+        # /users/home/cat3/projects/hanoxy/data/raw/TARA_030/ERR315862_1.fastq.gz
+        QC_RES_DIR + '/{sample}/{run}_{num}.fastq.gz'
+    params:
+        info = hlp.ui_config(SAMPLE, RUNS, RAW_DATA_DIR),
+        outdir = QC_RES_DIR
+    output:
+        expand('{qc_res_dir}/{sample}.ini', qc_res_dir = QC_RES_DIR, sample = SAMPLE)
+    shell:
+        'iu-gen-configs {params.info} -o {params.outdir}'
