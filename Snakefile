@@ -34,7 +34,7 @@ rule download_ena:
 rule qc_ini:
     input:
         # /users/home/cat3/projects/hanoxy/data/raw/TARA_030/ERR315862_1.fastq.gz
-        QC_RES_DIR + '/{sample}/{run}_{num}.fastq.gz'
+        expand('{raw_dir}/{sample}/{run}_{num}.fastq.gz', raw_dir = RAW_DATA_DIR, sample = SAMPLE, run = RUNS, num = NUM)
     params:
         info = hlp.ui_config(SAMPLE, RUNS, RAW_DATA_DIR),
         outdir = QC_RES_DIR
