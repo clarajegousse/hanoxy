@@ -11,7 +11,7 @@ SAMPLE = 'TARA_030'
 RUNS = hlp.sample2runs(SAMPLE, FILE)
 NUM = ['1', '2']
 
-ruleorder: download_ena > qc_ini
+#ruleorder: download_ena > qc_ini
 
 rule all:
     input:
@@ -28,7 +28,6 @@ rule all:
 #      """
 #      gzip {input}
 #      """
-
 
 rule download_ena:
     params:
@@ -51,12 +50,7 @@ rule qc_ini:
         '{raw_dir}/{sample}/{run}_{num}.fastq.gz'
     params:
         info = hlp.ui_config(SAMPLE, RUNS, RAW_DATA_DIR),
-        outdir = QC_RES_DIR,
-        sample = SAMPLE
     output:
-        '{qc_res_dir}/{sample}-QUALITY_PASSED_R{num}.fastq.gz',
+        expand('{qc_res_dir}/{sample}.ini', qc_res_dir = QC_RES_DIR, samples = SAMPLE)
     shell:
-        """
-        iu-gen-configs {params.info} -o {params.outdir}
-        iu-filter-quality-minoche {params.outdir}/{params.sample}.ini --ignore-deflines
-        """
+        'iu-gen-configs {params.info} -o {params.outdir}'
