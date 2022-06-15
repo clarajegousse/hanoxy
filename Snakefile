@@ -42,3 +42,11 @@ rule qc_ini:
         expand('{qc_res_dir}/{sample}.ini', qc_res_dir = QC_RES_DIR, sample = SAMPLE)
     shell:
         'iu-gen-configs {params.info} -o {params.outdir}'
+
+rule qc_minoche:
+    input:
+        expand('{qc_res_dir}/{sample}.ini', qc_res_dir = QC_RES_DIR, sample = SAMPLE)
+    output:
+        expand('{qc_res_dir}/{sample}-QUALITY_PASSED_R{num}.fastq', qc_res_dir = QC_RES_DIR, sample = SAMPLE, num = NUM)
+    shell:
+        'iu-filter-quality-minoche {input} --ignore-deflines'
