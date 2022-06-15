@@ -7,8 +7,8 @@ FILE = config['scratch_dir'] + config['samples_file_info']
 RAW_DATA_DIR = config['scratch_dir'] + config['raw_data_dir']
 QC_RES_DIR = config['scratch_dir'] + config['qc_res_dir']
 
-SAMPLES = ['TARA_030']
-RUNS = hlp.sample2runs(SAMPLES, FILE)
+SAMPLE = 'TARA_030'
+RUNS = hlp.sample2runs(SAMPLE, FILE)
 NUM = ['1', '2']
 
 #ruleorder: download_ena > qc_ini
@@ -17,18 +17,7 @@ rule all:
     input:
         expand('{raw_dir}/{sample}/{run}_{num}.fastq.gz', raw_dir = RAW_DATA_DIR, sample = SAMPLE, run = RUNS, num = NUM),
         expand('{qc_res_dir}/{sample}.ini', qc_res_dir = QC_RES_DIR, sample = SAMPLE)
-        #expand('{qc_res_dir}/{sample}-QUALITY_PASSED_R{num}.fastq.gz', qc_res_dir = QC_RES_DIR, sample = SAMPLE, num = NUM)
-        #"data/raw/{run}_{num}.fastq.gz"
 
-# rule compress_fastq:
-#     input:
-#         "{raw_dir}/{run}_{num}.fastq"
-#     output:
-#         "{raw_dir}/{run}_{num}.fastq.gz"
-#     shell:
-#      """
-#      gzip {input}
-#      """
 
 rule download_ena:
     params:
