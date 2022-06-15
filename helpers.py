@@ -32,8 +32,8 @@ def ui_config(sample, runs, raw_data_dir):
 		#print(header)
 		f.write(header)
 		for r in runs:
-			paths_to_r1.append(raw_data_dir + '/' + r + '_1.fastq.gz')
-			paths_to_r2.append(raw_data_dir + '/' + r + '_2.fastq.gz')
+			paths_to_r1.append(raw_data_dir + '/' + sample + '/' + r + '_1.fastq.gz')
+			paths_to_r2.append(raw_data_dir + '/' + sample + '/' + r + '_2.fastq.gz')
 		sample_info = sample + '\t' + ','.join(paths_to_r1) + '\t' + ','.join(paths_to_r2)
 		#print(sample_info)
 		f.write(sample_info)
