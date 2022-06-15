@@ -1,0 +1,9 @@
+__default__:
+  partition: "normal"
+  mail-type: "ALL"
+  mail-user: "cat3@hi.is"
+  name: "{rule}.{wildcards}"
+  output: "logs/cluster/{rule}.{wildcards}.out"
+  error: "logs/cluster/{rule}.{wildcards}.err"
+  time: 60
+  mem: "1g"
