@@ -19,6 +19,7 @@ rule all:
         expand('{qc_res_dir}/{sample}.ini', qc_res_dir = QC_RES_DIR, sample = SAMPLE),
         expand('{qc_res_dir}/{sample}-QUALITY_PASSED_R{num}.fastq', qc_res_dir = QC_RES_DIR, sample = SAMPLE, num = NUM),
         expand('{qc_res_dir}/{sample}-QUALITY_PASSED_R{num}.fastq.gz', qc_res_dir = QC_RES_DIR, sample = SAMPLE, num = NUM)
+        expand('/users/home/cat3/projects/hanoxy/results/counts/{sample}.tsv', sample = SAMPLE)
 
 rule download_ena:
     params:
