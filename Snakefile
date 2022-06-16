@@ -7,9 +7,11 @@ FILE = config['scratch_dir'] + config['samples_file_info']
 RAW_DATA_DIR = config['scratch_dir'] + config['raw_data_dir']
 QC_RES_DIR = config['scratch_dir'] + config['qc_res_dir']
 
-SAMPLE = 'TARA_030'
+SAMPLE = 'TARA_033'
 RUNS = hlp.sample2runs(SAMPLE, FILE)
 NUM = ['1', '2']
+
+ruleorder: download_ena > qc_ini > qc_minoche > compress
 
 rule all:
     input:
