@@ -69,7 +69,7 @@ rule count:
     input:
         r1 = expand('{qc_res_dir}/{sample}-QUALITY_PASSED_R1.fastq', qc_res_dir = QC_RES_DIR, sample = SAMPLE),
         r2 = expand('{qc_res_dir}/{sample}-QUALITY_PASSED_R2.fastq', qc_res_dir = QC_RES_DIR, sample = SAMPLE),
-        derep_dir "/users/home/cat3/projects/hanoxy/results/derep-genomes"
+        derep_dir = "/users/home/cat3/projects/hanoxy/results/derep-genomes"
     output:
         counts = expand('/users/home/cat3/projects/hanoxy/results/counts/{sample}.tsv', sample = SAMPLE)
     shell:
