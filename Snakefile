@@ -45,7 +45,9 @@ rule qc_ini:
     output:
         expand('{qc_res_dir}/{sample}.ini', qc_res_dir = QC_RES_DIR, sample = SAMPLE)
     shell:
-        'iu-gen-configs {params.info} -o {params.outdir}'
+        """
+        iu-gen-configs {params.info} -o {params.outdir}
+        """
 
 rule qc_minoche:
     input:
@@ -62,3 +64,21 @@ rule compress:
         expand('{qc_res_dir}/{sample}-QUALITY_PASSED_R{num}.fastq.gz', qc_res_dir = QC_RES_DIR, sample = SAMPLE, num = NUM)
     shell:
         'gzip {input}'
+
+rule count:
+    input:
+        r1 = expand('{qc_res_dir}/{sample}-QUALITY_PASSED_R1.fastq', qc_res_dir = QC_RES_DIR, sample = SAMPLE),
+        r2 = expand('{qc_res_dir}/{sample}-QUALITY_PASSED_R2.fastq', qc_res_dir = QC_RES_DIR, sample = SAMPLE)
+        derep_dir "/users/home/cat3/projects/hanoxy/results/derep-genomes"
+    output:
+        counts = expand('/users/home/cat3/projects/hanoxy/results/counts/{sample}.tsv', sample = SAMPLE)
+    shell:
+        """
+        coverm genome -1 {input.r1} \
+        -2 {input.r2} \
+        --genome-fasta-directory {input.derep_dir} \
+        --genome-fasta-extension "fna" \
+        --dereplicate \
+        --methods "count" --min-covered-fraction 0 \
+        -o {output.counts}
+        """
