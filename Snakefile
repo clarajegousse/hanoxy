@@ -7,7 +7,7 @@ FILE = config['scratch_dir'] + config['samples_file_info']
 RAW_DATA_DIR = config['scratch_dir'] + config['raw_data_dir']
 QC_RES_DIR = config['scratch_dir'] + config['qc_res_dir']
 
-SAMPLE = 'TARA_032'
+SAMPLE = 'TARA_030'
 RUNS = hlp.sample2runs(SAMPLE, FILE)
 NUM = ['1', '2']
 
