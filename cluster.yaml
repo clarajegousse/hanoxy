@@ -4,5 +4,5 @@ __default__:
   time: 60
   output: "logs_slurm/{rule}.{wildcards}.out"
   error: "logs_slurm/{rule}.{wildcards}.err"
-  email: "cat3@hi.is"
+  email: "cat3@hi.is" 
   email_type: "ALL"
