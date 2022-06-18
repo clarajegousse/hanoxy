@@ -2,7 +2,7 @@ __default__:
   partition: "normal"
   cpus: "4"
   time: 60
-  output: "logs_slurm/{rule}.{wildcards}.out"
-  error: "logs_slurm/{rule}.{wildcards}.err"
-  email: "cat3@hi.is" 
+  output: "logs_slurm/{rule}.{wildcards.sample}.out"
+  error: "logs_slurm/{rule}.{wildcards.sample}.err"
+  email: "cat3@hi.is"
   email_type: "ALL"
