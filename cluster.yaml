@@ -6,3 +6,6 @@ __default__:
   error: "logs_slurm/{rule}%A.err"
   email: "cat3@hi.is"
   email_type: "ALL"
+
+qc_minoche:
+  time: "24:00:00"
