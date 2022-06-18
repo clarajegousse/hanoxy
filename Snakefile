@@ -16,9 +16,9 @@ ruleorder: download_ena > qc_ini > qc_minoche > compress > count
 rule all:
     input:
         expand(RAW_DATA_DIR + '/{sample}/{run}_{num}.fastq.gz', sample = SAMPLE, run = RUNS, num = NUM),
-        #expand(RAW_DATA_DIR + '/{sample}.ini', sample = SAMPLE),
-        #expand(QC_RES_DIR + '/{sample}-QUALITY_PASSED_R{num}.fastq', sample = SAMPLE, num = NUM),
-        #expand(QC_RES_DIR + '/{sample}-QUALITY_PASSED_R{num}.fastq.gz', sample = SAMPLE, num = NUM),
+        expand(RAW_DATA_DIR + '/{sample}.ini', sample = SAMPLE),
+        expand(QC_RES_DIR + '/{sample}-QUALITY_PASSED_R{num}.fastq', sample = SAMPLE, num = NUM),
+        expand(QC_RES_DIR + '/{sample}-QUALITY_PASSED_R{num}.fastq.gz', sample = SAMPLE, num = NUM),
         expand('/users/home/cat3/projects/hanoxy/results/counts/{sample}.tsv', sample = SAMPLE)
 
 rule download_ena:
