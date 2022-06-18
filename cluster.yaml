@@ -1,8 +1,7 @@
 __default__:
-  partition: "normal"
-  cpus: "4"
   time: "48:00:00"
-  output: "logs_slurm/{rule}%A.out"
-  error: "logs_slurm/{rule}%A.err"
+  cpus: 1
+  output: "logs/{rule}%j-%A.out"
+  error: "logs/{rule}%j-%A.err"
   email: "cat3@hi.is"
   email_type: "ALL"
