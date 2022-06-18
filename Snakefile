@@ -69,8 +69,8 @@ rule compress:
 
 rule count:
     input:
-        r1 = expand(QC_RES_DIR + '/{sample}-QUALITY_PASSED_R1.fastq', sample = SAMPLE),
-        r2 = expand(QC_RES_DIR + '/{sample}-QUALITY_PASSED_R2.fastq', sample = SAMPLE),
+        r1 = expand(QC_RES_DIR + '/{sample}-QUALITY_PASSED_R1.fastq.gz', sample = SAMPLE),
+        r2 = expand(QC_RES_DIR + '/{sample}-QUALITY_PASSED_R2.fastq.gz', sample = SAMPLE),
         derep_dir = "/users/home/cat3/projects/hanoxy/results/derep-genomes"
     output:
         counts = expand('/users/home/cat3/projects/hanoxy/results/counts/{sample}.tsv', sample = SAMPLE)
