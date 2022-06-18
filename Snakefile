@@ -5,6 +5,7 @@ configfile: "config.yaml"
 #FILE = '/Users/jegoussc/Repositories/hanoxy/data/info/samples.txt'
 FILE = config['scratch_dir'] + config['samples_file_info']
 RAW_DATA_DIR = config['scratch_dir'] + config['raw_data_dir']
+RES_DIR = config['scratch_dir'] + 'results'
 QC_RES_DIR = config['scratch_dir'] + config['qc_res_dir']
 
 SAMPLE = 'TARA_030'
@@ -16,10 +17,10 @@ ruleorder: download_ena > qc_ini > qc_minoche > compress > count
 rule all:
     input:
         expand(RAW_DATA_DIR + '/{sample}/{run}_{num}.fastq.gz', sample = SAMPLE, run = RUNS, num = NUM),
-        expand(RAW_DATA_DIR + '/{sample}.ini', sample = SAMPLE),
+        expand(QC_RES_DIR + '/{sample}.ini', sample = SAMPLE),
         expand(QC_RES_DIR + '/{sample}-QUALITY_PASSED_R{num}.fastq', sample = SAMPLE, num = NUM),
         expand(QC_RES_DIR + '/{sample}-QUALITY_PASSED_R{num}.fastq.gz', sample = SAMPLE, num = NUM),
-        expand('/users/home/cat3/projects/hanoxy/results/counts/{sample}.tsv', sample = SAMPLE)
+        expand(RES_DIR + '/counts/{sample}.tsv', sample = SAMPLE)
 
 rule download_ena:
     params:
