@@ -1,11 +1,8 @@
 __default__:
   partition: "normal"
   cpus: "4"
-  time: 60
+  time: "48:00:00"
   output: "logs_slurm/{rule}%A.out"
   error: "logs_slurm/{rule}%A.err"
   email: "cat3@hi.is"
   email_type: "ALL"
-
-qc_minoche:
-  time: "24:00:00"
