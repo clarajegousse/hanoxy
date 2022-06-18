@@ -1,7 +1,9 @@
 __default__:
-  time: "48:00:00"
-  cpus: 1
+  queue: "normal"
+  time: "3-00:00:00"
+  email_type: "ALL"
+  email: "cat3@hi.is"
+  nodes: "1"
+  ntasks-per-node: "1"
   output: "logs/{rule}%j-%A.out"
   error: "logs/{rule}%j-%A.err"
-  email: "cat3@hi.is"
-  email_type: "ALL"
