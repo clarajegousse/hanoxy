@@ -52,24 +52,24 @@ rule qc_ini:
 
 rule qc_minoche:
     input:
-        expand('{qc_res_dir}/{sample}.ini', qc_res_dir = QC_RES_DIR, sample = SAMPLE)
+        expand(QC_RES_DIR + '/{sample}.ini', sample = SAMPLE)
     output:
-        expand('{qc_res_dir}/{sample}-QUALITY_PASSED_R{num}.fastq', qc_res_dir = QC_RES_DIR, sample = SAMPLE, num = NUM)
+        expand(QC_RES_DIR + '/{sample}-QUALITY_PASSED_R{num}.fastq', sample = SAMPLE, num = NUM)
     shell:
         'iu-filter-quality-minoche {input} --ignore-deflines'
 
 rule compress:
     input:
-        expand('{qc_res_dir}/{sample}-QUALITY_PASSED_R{num}.fastq', qc_res_dir = QC_RES_DIR, sample = SAMPLE, num = NUM)
+        expand(QC_RES_DIR + '/{sample}-QUALITY_PASSED_R{num}.fastq', sample = SAMPLE, num = NUM)
     output:
-        expand('{qc_res_dir}/{sample}-QUALITY_PASSED_R{num}.fastq.gz', qc_res_dir = QC_RES_DIR, sample = SAMPLE, num = NUM)
+        expand(QC_RES_DIR + '/{sample}-QUALITY_PASSED_R{num}.fastq.gz', sample = SAMPLE, num = NUM)
     shell:
         'gzip {input}'
 
 rule count:
     input:
-        r1 = expand('{qc_res_dir}/{sample}-QUALITY_PASSED_R1.fastq', qc_res_dir = QC_RES_DIR, sample = SAMPLE),
-        r2 = expand('{qc_res_dir}/{sample}-QUALITY_PASSED_R2.fastq', qc_res_dir = QC_RES_DIR, sample = SAMPLE),
+        r1 = expand(QC_RES_DIR + '/{sample}-QUALITY_PASSED_R1.fastq', sample = SAMPLE),
+        r2 = expand(QC_RES_DIR + '/{sample}-QUALITY_PASSED_R2.fastq', sample = SAMPLE),
         derep_dir = "/users/home/cat3/projects/hanoxy/results/derep-genomes"
     output:
         counts = expand('/users/home/cat3/projects/hanoxy/results/counts/{sample}.tsv', sample = SAMPLE)
