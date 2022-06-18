@@ -1,4 +1,5 @@
 __default__:
+  job-name: "{rule}-{wildcards}"
   queue: "normal"
   time: "3-00:00:00"
   email_type: "ALL"
