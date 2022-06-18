@@ -5,7 +5,7 @@ configfile: "config.yaml"
 #FILE = '/Users/jegoussc/Repositories/hanoxy/data/info/samples.txt'
 FILE = config['scratch_dir'] + config['samples_file_info']
 RAW_DATA_DIR = config['scratch_dir'] + config['raw_data_dir']
-RES_DIR = config['scratch_dir'] + 'results'
+RES_DIR = config['scratch_dir'] + '/results'
 QC_RES_DIR = config['scratch_dir'] + config['qc_res_dir']
 
 SAMPLE = 'TARA_030'
