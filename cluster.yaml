@@ -5,5 +5,5 @@ __default__:
   email: "cat3@hi.is"
   nodes: "1"
   ntasks-per-node: "1"
-  output: "logs/{rule}%j-%A.out"
-  error: "logs/{rule}%j-%A.err"
+  output: "logs/{rule}-%j.out"
+  error: "logs/{rule}-%j.err"
