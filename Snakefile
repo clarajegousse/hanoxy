@@ -39,12 +39,12 @@ rule download_ena:
 rule qc_ini:
     input:
         # /users/home/cat3/projects/hanoxy/data/raw/TARA_030/ERR315862_1.fastq.gz
-        expand('{raw_dir}/{sample}/{run}_{num}.fastq.gz', raw_dir = RAW_DATA_DIR, sample = SAMPLE, run = RUNS, num = NUM)
+        expand(RAW_DATA_DIR + '/{sample}/{run}_{num}.fastq.gz', sample = SAMPLE, run = RUNS, num = NUM)
     params:
         info = hlp.ui_config(SAMPLE, RUNS, RAW_DATA_DIR),
         outdir = QC_RES_DIR
     output:
-        expand('{qc_res_dir}/{sample}.ini', qc_res_dir = QC_RES_DIR, sample = SAMPLE)
+        expand(QC_RES_DIR + '/{sample}.ini', sample = SAMPLE)
     shell:
         """
         iu-gen-configs {params.info} -o {params.outdir}
