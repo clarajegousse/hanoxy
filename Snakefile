@@ -3,11 +3,11 @@ import helpers as hlp
 configfile: "config.yaml"
 
 SAMPLE = 'TARA_031'
+
+FILE = config['scratch_dir'] + config['samples_file_info']
 RUNS = hlp.sample2runs(SAMPLE, FILE)
 NUM = ['1', '2']
 
-#FILE = '/Users/jegoussc/Repositories/hanoxy/data/info/samples.txt'
-FILE = config['scratch_dir'] + config['samples_file_info']
 RAW_DATA_DIR = config['scratch_dir'] + config['raw_data_dir']
 RES_DIR = config['scratch_dir'] + '/results'
 QC_RES_DIR = config['scratch_dir'] + config['qc_res_dir']
