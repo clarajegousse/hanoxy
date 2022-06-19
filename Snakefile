@@ -77,11 +77,10 @@ rule count:
     shell:
         """
         coverm genome -1 {input.r1} \
-        -2 {input.r2} \
+        -2 {input.r2} --threads 4 \
         --genome-fasta-directory {input.derep_dir} \
         --genome-fasta-extension "fna" \
-        --methods "count" --min-covered-fraction 0 \
+        --methods count --min-covered-fraction 0 \
         --min-read-percent-identity 90 \
-        -t 4 \
         -o {output.counts}
         """
