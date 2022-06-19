@@ -2,24 +2,24 @@ import helpers as hlp
 
 configfile: "config.yaml"
 
+SAMPLE = 'TARA_031'
+RUNS = hlp.sample2runs(SAMPLE, FILE)
+NUM = ['1', '2']
+
 #FILE = '/Users/jegoussc/Repositories/hanoxy/data/info/samples.txt'
 FILE = config['scratch_dir'] + config['samples_file_info']
 RAW_DATA_DIR = config['scratch_dir'] + config['raw_data_dir']
 RES_DIR = config['scratch_dir'] + '/results'
 QC_RES_DIR = config['scratch_dir'] + config['qc_res_dir']
 
-SAMPLE = 'TARA_155'
-RUNS = hlp.sample2runs(SAMPLE, FILE)
-NUM = ['1', '2']
-
 ruleorder: download_ena > qc_ini > qc_minoche > compress > count
 
 rule all:
     input:
-        #expand(RAW_DATA_DIR + '/{sample}/{run}_{num}.fastq.gz', sample = SAMPLE, run = RUNS, num = NUM),
-        #expand(QC_RES_DIR + '/{sample}.ini', sample = SAMPLE),
-        #expand(QC_RES_DIR + '/{sample}-QUALITY_PASSED_R{num}.fastq', sample = SAMPLE, num = NUM),
-        #expand(QC_RES_DIR + '/{sample}-QUALITY_PASSED_R{num}.fastq.gz', sample = SAMPLE, num = NUM),
+        expand(RAW_DATA_DIR + '/{sample}/{run}_{num}.fastq.gz', sample = SAMPLE, run = RUNS, num = NUM),
+        expand(QC_RES_DIR + '/{sample}.ini', sample = SAMPLE),
+        expand(QC_RES_DIR + '/{sample}-QUALITY_PASSED_R{num}.fastq', sample = SAMPLE, num = NUM),
+        expand(QC_RES_DIR + '/{sample}-QUALITY_PASSED_R{num}.fastq.gz', sample = SAMPLE, num = NUM),
         expand(RES_DIR + '/counts/{sample}.tsv', sample = SAMPLE)
 
 rule download_ena:
@@ -80,7 +80,7 @@ rule count:
         -2 {input.r2} \
         --genome-fasta-directory {input.derep_dir} \
         --genome-fasta-extension "fna" \
-        --dereplicate \
-        --methods "count" --min-covered-fraction 0 \
+        --methods "relative_abundance,count" --min-covered-fraction 0 \
+        --min-read-percent-identity 90 \
         -o {output.counts}
         """
