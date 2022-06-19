@@ -80,7 +80,8 @@ rule count:
         -2 {input.r2} \
         --genome-fasta-directory {input.derep_dir} \
         --genome-fasta-extension "fna" \
-        --methods "relative_abundance,count" --min-covered-fraction 0 \
+        --methods "count" --min-covered-fraction 0 \
         --min-read-percent-identity 90 \
+        -t 4 \
         -o {output.counts}
         """
