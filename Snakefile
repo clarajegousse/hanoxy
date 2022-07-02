@@ -20,8 +20,8 @@ rule all:
         #expand(QC_RES_DIR + '/{sample}.ini', sample = SAMPLE),
         #expand(QC_RES_DIR + '/{sample}-QUALITY_PASSED_R{num}.fastq', sample = SAMPLE, num = NUM),
         #expand(QC_RES_DIR + '/{sample}-QUALITY_PASSED_R{num}.fastq.gz', sample = SAMPLE, num = NUM),
-        expand(RES_DIR + '/counts/{sample}.tsv', sample = SAMPLE)
-        expand(RES_DIR + '/abundance/{sample}.tsv', sample = SAMPLE)
+        expand(RES_DIR + '/counts/{sample}.tsv', sample = SAMPLE),
+        expand(RES_DIR + '/abundance/{sample}.tsv', sample = SAMPLE),
         expand(RES_DIR + '/tmp/{sample}.tsv', sample = SAMPLE)
 
 rule download_ena:
