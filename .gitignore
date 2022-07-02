@@ -3,3 +3,4 @@
 __pycache__/*
 *.fastq.gz
 *.fastq
+*.DS_Store
