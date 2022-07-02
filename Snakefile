@@ -111,7 +111,7 @@ rule tpm:
         r2 = expand(QC_RES_DIR + '/{sample}-QUALITY_PASSED_R2.fastq.gz', sample = SAMPLE),
         derep_dir = "/users/home/cat3/projects/hanoxy/results/derep-genomes"
     output:
-        abundance = expand('/users/home/cat3/projects/hanoxy/results/tpm/{sample}.tsv', sample = SAMPLE)
+        tpm = expand('/users/home/cat3/projects/hanoxy/results/tpm/{sample}.tsv', sample = SAMPLE)
     shell:
         """
         coverm genome -1 {input.r1} \
@@ -120,5 +120,5 @@ rule tpm:
         --genome-fasta-extension "fna" \
         --methods tpm --min-covered-fraction 10 \
         --min-read-percent-identity 90 \
-        -o {output.abundance}
+        -o {output.tpm}
         """
