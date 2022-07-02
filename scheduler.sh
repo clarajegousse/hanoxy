@@ -1,6 +1,6 @@
 if [ -z "$1" ]
 then
-    sbatch -J snake \
+    sbatch -p normal -t 92:00:00 -J snake \
     --wrap="snakemake --cluster-config cluster.yaml --cluster 'sbatch -t {cluster.time} -o {cluster.output} -e {cluster.error} --mail-type {cluster.email_type} --mail-user {cluster.email} -p {cluster.queue} ' -j 10 --latency-wait 60"
 elif [ $1 = 'unlock' ]
 then

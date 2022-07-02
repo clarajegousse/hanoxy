@@ -2,7 +2,7 @@ import helpers as hlp
 
 configfile: "config.yaml"
 
-SAMPLE = 'TARA_031'
+SAMPLE = 'TARA_124'
 
 FILE = config['scratch_dir'] + config['samples_file_info']
 RUNS = hlp.sample2runs(SAMPLE, FILE)
@@ -21,6 +21,8 @@ rule all:
         #expand(QC_RES_DIR + '/{sample}-QUALITY_PASSED_R{num}.fastq', sample = SAMPLE, num = NUM),
         #expand(QC_RES_DIR + '/{sample}-QUALITY_PASSED_R{num}.fastq.gz', sample = SAMPLE, num = NUM),
         expand(RES_DIR + '/counts/{sample}.tsv', sample = SAMPLE)
+        expand(RES_DIR + '/abundance/{sample}.tsv', sample = SAMPLE)
+        expand(RES_DIR + '/tmp/{sample}.tsv', sample = SAMPLE)
 
 rule download_ena:
     params:
@@ -80,7 +82,43 @@ rule count:
         -2 {input.r2} --threads 4 \
         --genome-fasta-directory {input.derep_dir} \
         --genome-fasta-extension "fna" \
-        --methods count --min-covered-fraction 0 \
+        --methods count --min-covered-fraction 10 \
         --min-read-percent-identity 90 \
         -o {output.counts}
+        """
+
+rule abundance:
+    input:
+        r1 = expand(QC_RES_DIR + '/{sample}-QUALITY_PASSED_R1.fastq.gz', sample = SAMPLE),
+        r2 = expand(QC_RES_DIR + '/{sample}-QUALITY_PASSED_R2.fastq.gz', sample = SAMPLE),
+        derep_dir = "/users/home/cat3/projects/hanoxy/results/derep-genomes"
+    output:
+        abundance = expand('/users/home/cat3/projects/hanoxy/results/abundance/{sample}.tsv', sample = SAMPLE)
+    shell:
+        """
+        coverm genome -1 {input.r1} \
+        -2 {input.r2} --threads 4 \
+        --genome-fasta-directory {input.derep_dir} \
+        --genome-fasta-extension "fna" \
+        --methods relative_abundance --min-covered-fraction 10 \
+        --min-read-percent-identity 90 \
+        -o {output.abundance}
+        """
+
+rule tpm:
+    input:
+        r1 = expand(QC_RES_DIR + '/{sample}-QUALITY_PASSED_R1.fastq.gz', sample = SAMPLE),
+        r2 = expand(QC_RES_DIR + '/{sample}-QUALITY_PASSED_R2.fastq.gz', sample = SAMPLE),
+        derep_dir = "/users/home/cat3/projects/hanoxy/results/derep-genomes"
+    output:
+        abundance = expand('/users/home/cat3/projects/hanoxy/results/tpm/{sample}.tsv', sample = SAMPLE)
+    shell:
+        """
+        coverm genome -1 {input.r1} \
+        -2 {input.r2} --threads 4 \
+        --genome-fasta-directory {input.derep_dir} \
+        --genome-fasta-extension "fna" \
+        --methods tpm --min-covered-fraction 10 \
+        --min-read-percent-identity 90 \
+        -o {output.abundance}
         """
