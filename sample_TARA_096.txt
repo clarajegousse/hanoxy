@@ -1,0 +1,2 @@
+sample	r1	r2
+TARA_096	/Users/jegoussc/Repositories/hanoxy/data/raw/TARA_096/ERR598967_1.fastq.gz	/Users/jegoussc/Repositories/hanoxy/data/raw/TARA_096/ERR598967_2.fastq.gz

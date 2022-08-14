@@ -1,4 +1,8 @@
 
+library(dplyr)
+library(tidyr)
+library(reshape)
+
 count_dir <- "/Users/jegoussc/Repositories/hanoxy/results/counts"
 
 count_files <- list.files(path = count_dir, pattern = 'tsv',
@@ -15,17 +19,23 @@ for (f in count_files) {
 
 colnames(counts) <- substr(colnames(counts), 1, 8)
 rownames(counts) <- substr(rownames(counts), 1, 13)
-df <- counts %>% select(-counts) %>% t()
-
-
-
+counts %>% 
+  select(-counts) %>% 
+  t() %>% melt()
 heatmap(df)
 
+
+df <- counts %>% 
+  select(-counts) %>% 
+  t() %>%
+  melt(id.vars = 1, measure.vars = "counts", 
+    preserve.na = TRUE)
+colnames(df) <- c('station_name', "genomes", "counts")
 
 longh <- read.csv("/Users/jegoussc/Repositories/haliea/INFOS/metadata.csv", 
   sep = ',')
 
-df <- merge(df, longh)
+df2 <- merge(longh, df, all = TRUE)
 
 
 library(rgeos)
@@ -69,3 +79,6 @@ ll <- map + geom_sf(data = longhurst, aes(fill = ProvCode), size = .1, col = "wh
     colour = DarkGrey, size = 3, check_overlap = TRUE) +
   coord_sf(expand = FALSE) + labs(x = 'longitude', y = 'latitude')
 
+ll
+
+ll + geom_point(aes(x = df2$longitude, y = df2$latitude, size = df2$counts, color = df2$genomes), alpha = 0.5)

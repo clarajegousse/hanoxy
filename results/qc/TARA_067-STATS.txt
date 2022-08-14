@@ -1,0 +1,8 @@
+number of pairs analyzed      : 78657375
+total pairs passed            : 74292359 (%94.45 of all pairs)
+  total pair_1 trimmed        : 5 (%0.00 of all passed pairs)
+  total pair_2 trimmed        : 6 (%0.00 of all passed pairs)
+total pairs failed            : 4365016 (%5.55 of all pairs)
+  pairs failed due to pair_1  : 1546677 (%35.43 of all failed pairs)
+  pairs failed due to pair_2  : 1702718 (%39.01 of all failed pairs)
+  pairs failed due to both    : 1115621 (%25.56 of all failed pairs)
