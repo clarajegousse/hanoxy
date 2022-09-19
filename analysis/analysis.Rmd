@@ -1,0 +1,1168 @@
+---
+title: "hanoxy"
+author: "Clara Jégousse"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Libraries
+
+```{r, message=FALSE}
+# data wrangling
+library(plyr)
+library(dplyr)
+library(tidyr)
+library(reshape)
+library(stringr)
+
+# maps and geography
+library(rgeos)
+library(sf) # World map
+library(rnaturalearth)
+
+# visualisation
+library(ggplot2)
+library(pheatmap)
+library(RColorBrewer)
+library(ggrepel)
+library(cowplot)
+
+# differential abundance analysis
+library(DESeq2)
+```
+
+# Data
+
+## Metadata
+
+The metadata contains information about the samples, such as the sampling date, the Longhurst region, the biome, GPS locations, and measurements like the temperature, salinity, oxygen, etc.
+
+```{r}
+meta <- read.csv("/Users/jegoussc/Repositories/hanoxy/data/info/metadata.csv", 
+  sep = ',')
+
+meta$sampling_date = as.Date(meta$sampling_date)
+# head(meta)
+```
+
+Function to get the seasons.
+
+```{r}
+date2season <- function(DATES) {
+    WS <- as.Date("2012-12-15", format = "%Y-%m-%d") # Winter Solstice
+    SE <- as.Date("2012-3-15",  format = "%Y-%m-%d") # Spring Equinox
+    SS <- as.Date("2012-6-15",  format = "%Y-%m-%d") # Summer Solstice
+    FE <- as.Date("2012-9-15",  format = "%Y-%m-%d") # Autumn Equinox
+
+    # Convert dates from any year to 2012 dates
+    d <- as.Date(strftime(DATES, format="2012-%m-%d"))
+
+    ifelse (d >= WS | d < SE, "Winter",
+      ifelse (d >= SE & d < SS, "Spring",
+        ifelse (d >= SS & d < FE, "Summer", "Autumn")))
+}
+```
+
+Add the season parameter to metadata.
+
+```{r}
+meta$season = date2season(meta$sampling_date)
+```
+
+## The global ocean and TARA ocean
+
+First, we retrieve the world map data which relies on the `rnaturalearth` package by [Andy South (2017).](https://cran.r-project.org/web/packages/rnaturalearth/index.html)
+
+```{r}
+world_map <- rnaturalearth::ne_countries(scale = 'small', returnclass = c("sf"))
+```
+
+Draw the base map.
+
+```{r}
+map = ggplot() +
+  geom_sf(data = world_map, size = .2, fill = 'white', col = 'white') +
+  theme(panel.grid.major = element_line(color = "grey", linetype = "dashed", size = 0.25)) +
+  coord_sf(expand = FALSE) + 
+  labs(x = 'Longitude', y = 'Latitude') 
+map
+```
+
+### Longhurst provinces
+
+Longhurst provinces represent a partition of the world oceans into provinces as defined by Longhurst (1995; 1998; 2006) based on the prevailing role of physical forcing as a regulator of phytoplankton distribution. Initially, these static boundaries were developed at the Bedford Institute of Oceanography, Canada.
+
+Note that the boundaries of these provinces are not fixed in time and space, but are dynamic and move under seasonal and inter-annual changes in physical forcing.
+
+Data set was downloaded from <https://www.marineregions.org/downloads.php>.
+
+```{r}
+# import longhurst provinces
+longhurst <- sf::read_sf("/Users/jegoussc/Repositories/haliea/INFOS/longhurst-world-v4-2010.shx")
+```
+
+Draw the blank world map with the Longhurst provinces.
+
+```{r, warning=FALSE, message=FALSE}
+longhurst_map = map + 
+  geom_sf(data = longhurst, aes(fill = ProvCode), 
+    size = .1, col = "white", alpha = .25) +
+  geom_sf_text(data = longhurst %>% 
+      group_by(ProvCode), aes(label = ProvCode),
+    colour = "black", size = 3, check_overlap = TRUE) +
+  scale_fill_manual(values = rev(colorRampPalette(brewer.pal(9, "YlGnBu"))(54))) +
+  coord_sf(expand = FALSE) + 
+  theme(legend.position = "none") + 
+  ggtitle(paste("Longhurst Biogeochemical Provinces -",
+    length(unique(longhurst$ProvCode)),"provinces"))
+
+longhurst_map
+```
+
+### Biomes
+
+At the first level of reduction, Longhurst recognized four principal biomes (also referred to as domains in earlier publications): the Polar biome, the Westerlies biome, the Trade-Winds biome, and the Coastal Boundary Zone biome. These four biomes are recognizable in every major ocean basin. At the next level of reduction, the ocean basins are partitioned into provinces, roughly ten for each basin. These partitions provide a template for data analysis or for making parameter assignments on a global scale.
+
+Add a column for a short biome or domain name.
+
+```{r}
+longhurst$biome = str_split(longhurst$ProvDescr, pattern = " - ", simplify = TRUE)[,1]
+
+# set order 
+longhurst$biome =  factor(longhurst$biome , levels = c("Polar", "Westerlies", "Trades", "Coastal"))
+```
+
+Draw the world map with the biomes
+
+```{r, warning=FALSE, message=FALSE}
+biomes_map = map + 
+  geom_sf(data = longhurst, aes(fill = biome), size = .1, col = "white", alpha = .5) +
+  theme(legend.position = "bottom", legend.direction = "horizontal") + 
+  scale_fill_brewer(palette = "RdBu", direction = -1) +
+  coord_sf(expand = FALSE) + 
+  labs(x = 'Longitude', y = 'Latitude', fill = "Biome") +
+  ggtitle("Biomes associated with Longhurst Biogeochemical Provinces")
+
+biomes_map
+
+legend_biome <- get_legend(biomes_map)
+
+```
+
+```{r, warning=FALSE, message=FALSE}
+plot_grid(longhurst_map, biomes_map + theme(legend.position = "none"), NULL, legend_biome,
+  labels = c("A", "B", "", ""), label_size = 12, 
+  ncol = 1, align = 'vh', axis = 'l', 
+  rel_heights = c(1,1,-.2,0.5), 
+  rel_widths = c(1,1,1,0.5))
+
+ggsave(
+  "fig-s1.pdf",
+  plot = last_plot(),
+  device = "pdf",
+  scale = 1,
+  width = 6,
+  height = 7.5,
+  dpi = 300
+)
+```
+
+```{r}
+biomes_map +
+  geom_point(aes(
+    x = meta$longitude, 
+    y = meta$latitude), shape = 3) + 
+  geom_text_repel(aes(
+    x = meta$longitude, 
+    y = meta$latitude, 
+  label=meta$station_name),
+    size = 2
+  )
+```
+
+```{r}
+meta %>%
+  group_by(biome) %>%
+  select(biome, temperature) %>%
+  summarise_at(vars(temperature), list(temp = mean))
+```
+
+```{r}
+meta %>%
+  group_by(biome) %>%
+  select(biome, salinity) %>%
+  summarise_at(vars(salinity), list(sali = mean))
+```
+
+```{r}
+meta %>%
+  group_by(biome) %>%
+  select(biome, nitrate) %>%
+  summarise_at(vars(nitrate), list(nit = mean), na.rm = TRUE)
+```
+
+```{r}
+meta %>%
+  group_by(biome) %>%
+  select(biome, chlorophyll) %>%
+  summarise_at(vars(chlorophyll), list(chloro_mean = mean, chloro_sd = sd), na.rm = TRUE)
+```
+
+## Genomes
+
+```{r}
+gtdb_info = read.delim("/Users/jegoussc/Repositories/hanoxy/data/info/haliea-gtdb.tsv")
+genome_info = gtdb_info %>% separate(data = ., col = ncbi_taxo, 
+  into = c('ncbi_domain', 'ncbi_phylum', 'ncbi_class', 'ncbi_order', 'ncbi_family', 'ncbi_genus', 'ncbi_species'), 
+  sep = ";") %>%
+  separate(data = ., col = gtdb_taxo, into = c('domain', 'gtdb_phylum', 'gtdb_class', 'gtdb_order', 'gtdb_family', 'gtdb_genus', 'gtdb_species'), sep = ";") %>%
+  mutate(gtdb_species = substr(gtdb_species,5,nchar(gtdb_species)),
+    gtdb_genus = substr(gtdb_genus,5,nchar(gtdb_genus))) %>%
+  dplyr::select(id, ncbi_organism_name, gtdb_genus, gtdb_species)
+```
+
+## Count data
+
+Count data computed by [`CoverM`](https://wwood.github.io/CoverM/coverm-genome.html), which uses the mapping algorythm `minimap2`. The count data is the number of reads aligned toq each genome. Note that a single read may be aligned to multiple genomes with supplementary alignments.
+
+Locate the files
+
+```{r}
+count_dir <- "/Users/jegoussc/Repositories/hanoxy/results/counts"
+count_files <- list.files(path = count_dir, pattern = 'tsv',
+  full.names = TRUE)
+```
+
+Read count data files
+
+```{r}
+counts <- NA
+for (f in count_files) {
+ # print(f)
+  r <- read.delim(file = f, header = TRUE,
+    row.names = 1)
+  counts = cbind(counts, r)
+}
+```
+
+Rename columns
+
+```{r}
+colnames(counts) <- substr(colnames(counts), 1, 8)
+rownames(counts) <- substr(rownames(counts), 1, 15)
+```
+
+Inspect the data frame
+
+```{r, include=FALSE}
+counts %>%
+  head()
+```
+
+Cleanup the data frame
+
+```{r}
+counts = counts %>% 
+  select(-counts) # remove the empty counts column
+```
+
+Melt dataset
+
+```{r}
+mcounts = counts %>%
+  t() %>% # transpose
+  melt() # melt
+
+# rename the columns
+colnames(mcounts) = c("station_name", "genome", "count")
+
+# inspect the resulting dataframe
+mcounts %>%
+  head()
+```
+
+Explore distribution
+
+```{r}
+hist(mcounts$count, breaks = 100,
+  main = "Histogram of counts", xlab = "Counts")
+```
+
+```{r}
+mcts_genus = counts %>% 
+  mutate(id = rownames(counts)) %>%
+  left_join(., genome_info, by = 'id') %>%
+  group_by(gtdb_genus) %>%
+  summarise(across(starts_with(c("TARA", "MIME")), mean)) %>%
+  select(gtdb_genus, starts_with(c("TARA", "MIME"))) %>%
+  as.data.frame() %>%
+  filter(!is.na(gtdb_genus)) %>%
+  melt()
+
+colnames(mcts_genus) = c("gtdb_genus", "station_name", "count")
+mcts_genus$count = round(mcts_genus$count, digits = 0)
+
+mcts_genus = left_join(mcts_genus, meta, by = "station_name")
+```
+
+# Analysis
+
+## Relative proportions
+
+Scale count data to library size to know the proportions of metagenomic reads recruited by the Halieaceae genomes in percentages.
+
+```{r}
+perc = counts
+for (s in colnames(counts)) {
+  perc[,s] = counts[,s]/meta[meta$station_name == s,]$filtered_reads * 100 
+}
+```
+
+```{r, include=FALSE}
+head(perc %>%
+    round(., digits = 3))
+```
+
+Per genus
+
+```{r}
+mperc_genus = perc %>%
+  round(., digits = 3) %>%
+  mutate(id = rownames(.)) %>%
+  left_join(., genome_info, by = 'id') %>%
+  group_by(gtdb_genus) %>%
+   summarise(across(where(is.numeric), sum)) %>%
+  as.data.frame() %>%
+  melt()
+
+colnames(mperc_genus) = c("genus", "station_name", "abundance")
+```
+
+Mean abundance per genus
+
+```{r}
+mperc_genus %>% select(genus, abundance) %>% group_by(genus) %>%
+    summarise(across(where(is.numeric), c(mean = mean, sd = sd))) %>%
+  arrange(abundance_mean) 
+```
+
+Per species
+
+```{r}
+mperc_species = perc %>%
+  round(., digits = 3) %>%
+  mutate(id = rownames(.)) %>%
+  left_join(., genome_info, by = 'id') %>%
+  group_by(gtdb_species) %>%
+   summarise(across(where(is.numeric), sum)) %>%
+  as.data.frame() %>%
+  melt()
+
+colnames(mperc_species) = c("species", "station_name", "abundance")
+```
+
+```{r}
+mperc_species %>% select(species, abundance) %>% 
+  group_by(species) %>%
+    summarise(across(where(is.numeric), mean)) %>% 
+  arrange(abundance)
+```
+
+Merge the percentages of metagenomic reads recruited by the Halieaceae genomes.
+
+```{r}
+mperc_genus = merge(mperc_genus, meta)
+mperc_species = merge(mperc_species, meta)
+```
+
+Percentage per biome
+
+```{r}
+mperc_species %>%
+  group_by(biome) %>%
+  summarise_at(., vars(abundance), c(mean, min, max, sd)) %>%
+  select(fn1) %>% mutate(fn1 = fn1 *100) %>% round(., digits = 1)
+```
+
+```{r}
+ggplot(mperc_genus, aes(x=abundance, fill = genus, colour = genus)) + 
+  geom_density(alpha = .5) + 
+  facet_grid(genus~., margins = TRUE, scales = "free") + 
+  theme_minimal() + 
+  scale_fill_manual(values = colorRampPalette(brewer.pal(8, "Spectral"))(14)) +
+  scale_colour_manual(values = colorRampPalette(brewer.pal(8, "Spectral"))(14))
+```
+
+```{r}
+ggsave(
+  "fig-s2.pdf",
+  plot = last_plot(),
+  device = "pdf",
+  scale = 1,
+  width = 8,
+  height = 9,
+  dpi = 300
+)
+```
+
+```{r}
+dat = mperc_species %>%
+  select(station_name, abundance) %>%
+  group_by(station_name) %>%
+   summarise(across(where(is.numeric), sum)) %>%
+  as.data.frame() %>%
+  left_join(., meta)
+
+map +
+  geom_point(aes(
+    x = dat$longitude, 
+    y = dat$latitude,
+    size = dat$abundance,
+    colour = dat$biome),
+    alpha = .75) +
+  scale_colour_manual(values = c(brewer.pal(4, "RdBu")[1], brewer.pal(4, "RdBu")[4], brewer.pal(4, "RdBu")[2], brewer.pal(4, "RdBu")[3])) +
+  labs(#title = "Global distribution of the Halieaceae family",
+    colour = "Biome", size = "Abundance (%)",
+    #caption = "Percentages of metagenomics reads mapped to 69 de-replicated Halieaceae genomes\nat sampling stations representing the four marine biomes."
+    )
+
+ggsave(
+  "fig-2.pdf",
+  plot = last_plot(),
+  device = "pdf",
+  scale = 1,
+  width = 8,
+  height = 4,
+  dpi = 300
+)
+```
+
+## Genus level
+
+### Normalisation with DESeq
+
+This is an alternative to the scaling. Indeed, DESeq needs un-normalised count data as input.
+
+<http://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#the-deseqdataset>
+
+Merge count data with genome info
+
+```{r}
+cts_genus = counts %>% 
+  mutate(id = rownames(counts)) %>%
+  left_join(., genome_info, by = 'id') %>%
+  group_by(gtdb_genus) %>%
+  summarise(across(starts_with(c("TARA", "MIME")), mean)) %>%
+  select(gtdb_genus, starts_with(c("TARA", "MIME"))) %>%
+  as.data.frame() %>%
+  filter(!is.na(gtdb_genus))
+
+rownames(cts_genus) = cts_genus$gtdb_genus
+cts_genus = cts_genus %>% select(starts_with(c("TARA", "MIME")))
+cts_genus = round(cts_genus, digits = 0)
+```
+
+```{r}
+coldata = meta %>% filter(station_name %in% colnames(cts_genus))
+rownames(coldata) = coldata$station_name
+
+coldata = coldata %>% 
+  mutate(condition = ifelse(biome == "Polar", "Polar", "Non Polar"))
+
+all(rownames(coldata) == colnames(cts_genus))
+```
+
+```{r, message=FALSE, warning=FALSE}
+dds <- DESeqDataSetFromMatrix(countData = cts_genus,
+                              colData = coldata,
+                              design = ~ biome) # biome or condition?
+dds
+```
+
+```{r}
+featureData <- data.frame(genome=rownames(cts_genus))
+mcols(dds) <- DataFrame(mcols(dds), featureData)
+mcols(dds)
+```
+
+### Differential abundance analysis
+
+Apply methodology by Anders et al. (2010) <https://genomebiology.biomedcentral.com/articles/10.1186/gb-2010-11-10-r106#Sec2>
+
+```{r, message=FALSE}
+# calculate geometric means prior to estimate size factors
+gm_mean = function(x, na.rm=TRUE){
+  exp(sum(log(x[x > 0]), na.rm=na.rm) / length(x))
+}
+
+geoMeans = apply(counts(dds), 1, gm_mean)
+dds = estimateSizeFactors(dds, geoMeans = geoMeans)
+```
+
+Differential abundances analysis based on the Negative Binomial (a.k.a. Gamma-Poisson) distribution with Wald test
+
+```{r, message=FALSE}
+dds <- DESeq(dds)
+wtres <- results(dds)
+```
+
+Likelihood ratio test (chi-squared test) for GLMs to test for significance of change in deviance between a full (\~biome) and reduced model.
+
+```{r}
+dds <- estimateDispersionsGeneEst(dds)
+dispersions(dds) <- mcols(dds)$dispGeneEst
+dds <- nbinomLRT(dds, reduced = ~ 1)
+lrtres <- results(dds)
+```
+
+```{r, include=FALSE}
+res = lrtres
+```
+
+Select the species that differentially present between the conditions.
+
+```{r}
+differential_genera = res %>% as.data.frame() %>%
+  filter(padj < 0.05) %>%
+  rownames()
+differential_genera
+```
+
+Extract the normalised counts
+
+```{r}
+ncts_genus = round(assay(normTransform(dds)), digits = 0)
+```
+
+Melt the normalised counts
+
+```{r, warning=FALSE}
+mncts_genus = ncts_genus %>%
+  t() %>% # transpose
+  melt() # melt
+
+# rename the columns
+colnames(mncts_genus) = c("station_name", "genus", "count")
+```
+
+Possibility to inspect the resulting dataframe
+
+```{r, include=FALSE}
+mncts_genus %>%
+  head()
+```
+
+### Abundance heatmap
+
+Prepare the matrix to plot the heatmap; here we subselect the differential species.
+
+```{r}
+ordered_station_names = meta %>%
+  filter(station_name %in% colnames(ncts_genus)) %>%
+  arrange(biome, ocean, station_name) %>%
+  select(station_name)
+
+#matrix = ncts[rownames(ncts) %in% differential_species,] %>% unlist() %>%
+#  as.data.frame() %>%
+#  select(ordered_station_names$station_name)
+
+matrix = ncts_genus %>% unlist() %>%
+  as.data.frame() %>%
+  select(ordered_station_names$station_name)
+```
+
+Set categorical variables and graphic parameters.
+
+```{r}
+# significance levels
+anno_sign = res %>% as.data.frame() %>%
+  select(padj) %>%
+  mutate(significance = gtools::stars.pval(padj)) %>%
+  select(significance) %>%
+  mutate(significance = replace(significance, significance %in% c(NA, ".", "", " "), "NS"))
+
+anno <- as.data.frame(colData(dds)[,c("biome", "ocean", "season")])
+
+# colour palette for the biomes
+biome_colours <- brewer.pal(4, "RdBu")
+names(biome_colours) <- unique(anno$biome)
+
+# colour palette for the oceans
+ocean_colours <- brewer.pal(6, "YlGnBu")[2:6]
+names(ocean_colours) <- unique(anno$ocean)
+
+season_colours = brewer.pal(4, "Pastel2")
+names(season_colours) <- unique(anno$season)
+
+significance_colours = c(brewer.pal(4, "Reds"))
+names(significance_colours) <- c("NS", "*", "**", "***")
+
+annoCol <- list(ocean = ocean_colours, 
+  biome = biome_colours,
+  season = season_colours,
+  significance =significance_colours)
+```
+
+Check number of clusters
+
+```{r}
+library(factoextra)
+library(NbClust)
+df = scale(matrix)
+# Elbow method
+fviz_nbclust(df, kmeans, method = "wss") + #c("silhouette", "wss", "gap_stat"),
+    geom_vline(xintercept = 4, linetype = 2)+
+  labs(subtitle = "Elbow method")
+```
+
+Draw the heatmap
+
+```{r, out.width = '100%'}
+pheatmap(matrix, 
+  color = colorRampPalette(rev(brewer.pal(n = 7, name = "Spectral")))(100),
+  cluster_rows = TRUE, 
+  show_rownames = TRUE,
+  show_colnames = TRUE,
+  cluster_cols = FALSE,
+  fontsize_row = 7,
+  fontsize_col = 5,
+  annotation_col = anno,
+  annotation_row = anno_sign,
+  border_color = "white", 
+  clustering_method = "complete", # "ward.D"
+  annotation_colors = annoCol,
+  cutree_rows = 4,
+  treeheight_row = 20,
+  gaps_col = c(12, 29, 54),
+  #main = "Global distribution of Halieaceae genera."
+  ) %>% ggplotify::as.ggplot()
+```
+
+```{r}
+ggsave(
+  "fig-s3.pdf",
+  plot = last_plot(),
+  device = "pdf",
+  scale = 1,
+  width = 8,
+  height = 5,
+  dpi = 300
+)
+```
+
+## Species level
+
+### Normalisation with DESeq
+
+This is an alternative to the scaling. Indeed, DESeq needs un-normalised count data as input.
+
+<http://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#the-deseqdataset>
+
+Merge count data with genome info
+
+```{r}
+cts_species = counts %>% 
+  mutate(id = rownames(counts)) %>%
+  left_join(., genome_info, by = 'id') %>%
+  group_by(gtdb_species) %>%
+  summarise(across(starts_with(c("TARA","MIME")), mean)) %>%
+  select(gtdb_species, starts_with(c("TARA","MIME"))) %>%
+  as.data.frame() %>%
+  filter(!is.na(gtdb_species))
+
+rownames(cts_species) = cts_species$gtdb_species
+cts_species = cts_species %>% select(starts_with(c("TARA","MIME")))
+cts_species = round(cts_species, digits = 0)
+```
+
+```{r}
+coldata = meta %>% filter(station_name %in% colnames(cts_species))
+rownames(coldata) = coldata$station_name
+
+coldata = coldata %>% 
+  mutate(condition = ifelse(biome == "Polar", "Polar", "Non Polar"))
+
+all(rownames(coldata) == colnames(cts_species))
+```
+
+```{r, message=FALSE, warning=FALSE}
+dds <- DESeqDataSetFromMatrix(countData = cts_species,
+                              colData = coldata,
+                              design = ~ biome) # biome or condition?
+dds
+```
+
+```{r}
+featureData <- data.frame(genome=rownames(cts_species))
+mcols(dds) <- DataFrame(mcols(dds), featureData)
+mcols(dds)
+```
+
+Extract the normalised counts
+
+```{r}
+ncts_species = round(assay(normTransform(dds)), digits = 0)
+```
+
+Melt the normalised counts
+
+```{r, warning=FALSE}
+mncts_species = ncts_species %>%
+  t() %>% # transpose
+  melt() # melt
+
+# rename the columns
+colnames(mncts_species) = c("station_name", "species", "count")
+```
+
+Mean of species count
+
+```{r}
+summary(t(ncts_species))[4,] %>% sort()
+```
+
+Possibility to inspect the resulting data frame
+
+```{r, eval=FALSE}
+mncts_species %>%
+  head()
+```
+
+```{r, eval=FALSE}
+left_join(mncts_species, meta) %>%
+  group_by(biome, species) %>%
+  summarise(across(where(is.numeric), c(mean = mean, sd = sd))) %>%
+  arrange(count_mean)
+
+left_join(mncts_species, meta) %>%
+  arrange(count) %>%
+  ggplot(., aes(x = species, y = count)) + geom_boxplot() + facet_wrap(~biome, ncol =1 ) + theme(axis.text.x = element_text(angle = 90))
+```
+
+### Differential abundance analysis
+
+Apply methodology by Anders et al. (2010) <https://genomebiology.biomedcentral.com/articles/10.1186/gb-2010-11-10-r106#Sec2>
+
+```{r, message=FALSE}
+# calculate geometric means prior to estimate size factors
+gm_mean = function(x, na.rm=TRUE){
+  exp(sum(log(x[x > 0]), na.rm=na.rm) / length(x))
+}
+
+geoMeans = apply(counts(dds), 1, gm_mean)
+dds = estimateSizeFactors(dds, geoMeans = geoMeans)
+```
+
+Differential abundances analysis based on the Negative Binomial (a.k.a. Gamma-Poisson) distribution with Wald test
+
+```{r, message=FALSE}
+dds <- DESeq(dds)
+wtres <- results(dds)
+```
+
+Likelihood ratio test (chi-squared test) for GLMs to test for significance of change in deviance between a full (\~biome) and reduced model.
+
+```{r}
+dds <- estimateDispersionsGeneEst(dds)
+dispersions(dds) <- mcols(dds)$dispGeneEst
+dds <- nbinomLRT(dds, reduced = ~ 1)
+lrtres <- results(dds)
+```
+
+```{r, include=FALSE}
+res = lrtres
+```
+
+Select the species that differentially present between the conditions.
+
+```{r}
+differential_species = res %>% as.data.frame() %>%
+  filter(padj < 0.05) %>%
+  rownames()
+differential_species
+```
+
+### Abundance heatmap
+
+Prepare the matrix to plot the heatmap; here we subselect the differential species.
+
+```{r}
+ordered_station_names = meta %>%
+  filter(station_name %in% colnames(ncts_species)) %>%
+  arrange(biome, ocean, station_name) %>%
+  select(station_name)
+
+#matrix = ncts[rownames(ncts) %in% differential_species,] %>% unlist() %>%
+#  as.data.frame() %>%
+#  select(ordered_station_names$station_name)
+
+matrix = ncts_species %>% unlist() %>%
+  as.data.frame() %>%
+  select(ordered_station_names$station_name)
+```
+
+Check number of clusters
+
+```{r}
+library(factoextra)
+library(NbClust)
+df = scale(matrix)
+# Elbow method
+fviz_nbclust(df, kmeans, method = "wss") + #c("silhouette", "wss", "gap_stat"),
+    geom_vline(xintercept = 4, linetype = 2)+
+  labs(subtitle = "Elbow method")
+```
+
+Set categorical variables and graphic parameters.
+
+```{r}
+# significance levels
+anno_sign = res %>% as.data.frame() %>%
+  select(padj) %>%
+  mutate(significance = gtools::stars.pval(padj)) %>%
+  select(significance) %>%
+  mutate(significance = replace(significance, significance %in% c(NA, ".", "", " "), "NS"))
+
+anno <- as.data.frame(colData(dds)[,c("biome", "ocean", "season")])
+
+# colour palette for the biomes
+biome_colours <- brewer.pal(4, "RdBu")
+names(biome_colours) <- unique(anno$biome)
+
+# colour palette for the oceans
+ocean_colours <- brewer.pal(6, "YlGnBu")[2:6]
+names(ocean_colours) <- unique(anno$ocean)
+
+season_colours = brewer.pal(4, "Pastel2")
+names(season_colours) <- unique(anno$season)
+
+significance_colours = c(brewer.pal(4, "Reds"))
+names(significance_colours) <- c("NS", "*", "**", "***")
+
+annoCol <- list(ocean = ocean_colours, 
+  biome = biome_colours,
+  season = season_colours,
+  significance =significance_colours)
+```
+
+Draw the heatmap
+
+```{r}
+hm = pheatmap(matrix, 
+  color = colorRampPalette(rev(brewer.pal(n = 7, name = "Spectral")))(100),
+  cluster_rows = TRUE, 
+  show_rownames = TRUE,
+  show_colnames = TRUE,
+  cluster_cols = FALSE,
+  fontsize_row = 7,
+  annotation_col = anno,
+  annotation_row = anno_sign,
+  border_color = "white", 
+  clustering_method = "ward.D", #ward.D", "ward.D2", "single", "complete", "average" (= UPGMA), "mcquitty" (= WPGMA), "median" (= WPGMC) or "centroid" (= UPGMC).
+  annotation_colors = annoCol,
+  cutree_rows = 4, #gaps_row = c(2,3,4,7,8,12,29,31,63,64,68),
+  treeheight_row = 20,
+  gaps_col = c(12, 29, 54),
+  
+  #main = "Abundance heatmap"
+  )
+```
+
+```{r, out.width = '100%'}
+pheatmap(matrix, 
+  color = colorRampPalette(rev(brewer.pal(n = 7, name = "Spectral")))(100),
+  cluster_rows = TRUE, 
+  show_rownames = TRUE,
+  show_colnames = TRUE,
+  cluster_cols = FALSE,
+  fontsize_row = 7,
+  fontsize_col = 5,
+  annotation_col = anno,
+  annotation_row = anno_sign,
+  border_color = "white", 
+  clustering_method = "ward.D", 
+  annotation_colors = annoCol,
+  cutree_rows = 4,
+  treeheight_row = 20,
+  gaps_col = c(12, 29, 54),
+  #main = "Abundance heatmap"
+  ) %>% ggplotify::as.ggplot()
+```
+
+```{r}
+ggsave(
+  "fig-3.pdf",
+  plot = last_plot(),
+  device = "pdf",
+  scale = 1,
+  width = 8,
+  height = 8,
+  dpi = 300
+)
+```
+
+extract clusters
+
+```{r}
+clust <- cbind(matrix, 
+  cluster = cutree(hm$tree_row, 
+    k = 4))
+
+ubiquitous = clust %>%
+  filter(cluster == 1) %>% rownames()
+rare = clust %>%
+  filter(cluster == 2) %>% rownames()
+coldtolerant = clust %>%
+  filter(cluster == 3) %>% rownames()
+coldintolerant = clust %>%
+  filter(cluster == 4) %>% rownames()
+
+#order_cluster = c(ubiquitous, rare, coldtolerant, coldintolerant)
+order_cluster <- rev(rownames(matrix[c(hm$tree_row[["order"]]),]))
+```
+
+# Correlations
+
+A negative binomial (NB) generalised linear model (GLM) was fit for each species against each of the variables in the metadata separately, using Deseq2.
+
+A Wald test was then performed on each fit to assess the significance of the independent variable, followed by correction of the p values using the Benjamini−Hochberg (BH) method.
+
+What genera display differential abundances depending on the temperature Fit NB GLM to the relationship between the abundances (counts) and the temperature (abundance as a function of temperature).
+
+The Wald test can also be used with continuous variables such environmental measurements (temperature, salinity, etc.). In this case, the reported log2 fold change is per unit of change of that variable ("log2 fold change per degree C differences.")
+
+Wald test for the GLM coefficients
+
+This function tests for significance of coefficients in a Negative Binomial GLM, using previously calculated sizeFactors (or normalizationFactors) and dispersion estimates.
+
+The fitting proceeds as follows: standard maximum likelihood estimates for GLM coefficients (synonymous with "beta", "log2 fold change", "effect size") are calculated.
+
+For calculating Wald test p-values, the coefficients are scaled by their standard errors and then compared to a standard Normal distribution. The results function without any arguments will automatically perform a contrast of the last level of the last variable in the design formula over the first level. The contrast argument of the results function can be used to generate other comparisons.
+
+Missing measurement for MIME samples; exclude these samples.
+
+```{r}
+cts_species = cts_species %>% select(starts_with("TARA"))
+coldata = filter(coldata, grepl("TARA",station_name))
+```
+
+### Temperature
+
+Fit NB GLM and test for the significance of the coefficients using the Wald test.
+
+```{r message=FALSE, warning=FALSE}
+dds <- DESeqDataSetFromMatrix(countData = cts_species,
+                              colData = coldata,
+                              design = ~ temperature) 
+dds = DESeq(dds)
+dds <- estimateSizeFactors(dds)
+dds <- estimateDispersions(dds)
+dds <- nbinomWaldTest(dds)
+ 
+restemp = as.data.frame(results(dds)) %>% 
+  mutate(variable = "temperature") %>% 
+  add_rownames(., var = 'genus') %>%
+  select(genus, variable, log2FoldChange, padj) %>%
+  mutate(sign = gtools::stars.pval(padj)) %>%
+  mutate(genus = factor(genus, levels = order_cluster))
+```
+
+### Salinity
+
+Fit NB GLM and test for the significance of the coefficients using the Wald test.
+
+```{r message=FALSE, warning=FALSE}
+dds <- DESeqDataSetFromMatrix(countData = cts_species,
+                              colData = coldata,
+                              design = ~ salinity) # biome or condition?
+dds = DESeq(dds)
+dds <- estimateSizeFactors(dds)
+dds <- estimateDispersions(dds)
+dds <- nbinomWaldTest(dds)
+
+ressalinity = as.data.frame(results(dds)) %>% 
+  mutate(variable = "salinity") %>% 
+  add_rownames(., var = 'genus') %>%
+  select(genus, variable, log2FoldChange, padj) %>%
+  mutate(sign = gtools::stars.pval(padj)) %>%
+  mutate(genus = factor(genus, levels = order_cluster))
+```
+
+### Nitrate
+
+Fit NB GLM and test for the significance of the coefficients using the Wald test.
+
+```{r, message=FALSE}
+dds <- DESeqDataSetFromMatrix(countData = cts_species,
+                              colData = coldata,
+                              design = ~ nitrate) 
+dds = DESeq(dds)
+dds <- estimateSizeFactors(dds)
+dds <- estimateDispersions(dds)
+dds <- nbinomWaldTest(dds)
+
+resnitrate = as.data.frame(results(dds)) %>% 
+  mutate(variable = "nitrate") %>% 
+  add_rownames(., var = 'genus') %>%
+  select(genus, variable, log2FoldChange, padj) %>%
+  mutate(sign = gtools::stars.pval(padj)) %>%
+  mutate(genus = factor(genus, levels = order_cluster))
+```
+
+### Oxygen
+
+Fit NB GLM and test for the significance of the coefficients using the Wald test.
+
+```{r, message=FALSE}
+dds <- DESeqDataSetFromMatrix(countData = cts_species,
+                              colData = coldata,
+                              design = ~ oxygen) 
+dds = DESeq(dds)
+dds <- estimateSizeFactors(dds)
+dds <- estimateDispersions(dds)
+dds <- nbinomWaldTest(dds)
+
+resoxygen = as.data.frame(results(dds)) %>% 
+  mutate(variable = "oxygen") %>% 
+  add_rownames(., var = 'genus') %>%
+  select(genus, variable, log2FoldChange, padj) %>%
+  mutate(sign = gtools::stars.pval(padj)) %>%
+  mutate(genus = factor(genus, levels = order_cluster))
+```
+
+### Chlorophyll
+
+Fit NB GLM and test for the significance of the coefficients using the Wald test.
+
+```{r message=FALSE, warning=FALSE}
+dds <- DESeqDataSetFromMatrix(countData = cts_species,
+                              colData = coldata,
+                              design = ~ chlorophyll) 
+dds = DESeq(dds)
+dds <- estimateSizeFactors(dds)
+dds <- estimateDispersions(dds)
+dds <- nbinomWaldTest(dds)
+
+reschlorophyll = as.data.frame(results(dds)) %>% 
+  mutate(variable = "chlorophyll") %>% 
+  add_rownames(., var = 'genus') %>%
+  select(genus, variable, log2FoldChange, padj) %>%
+  mutate(sign = gtools::stars.pval(padj)) %>%
+  mutate(genus = factor(genus, levels = order_cluster))
+```
+
+### Heatmap
+
+Set colour scheme for each environmental variable (according to the [CPK coloring](https://en.wikipedia.org/wiki/CPK_coloring) of chemical elements)
+
+```{r}
+coltemp = scale_fill_distiller(palette = "RdBu")
+
+colsalinity = scale_fill_gradient2(
+  midpoint = 0, mid = "white",
+  low = brewer.pal(8,"Greys")[6],
+  high = brewer.pal(5,"Purples")[5])
+
+colnitrate = scale_fill_gradient2(
+  midpoint = 0, mid = "white",
+  low = brewer.pal(8,"Greys")[6],
+  high = brewer.pal(5,"Blues")[5])
+
+coloxygen = scale_fill_distiller(palette = "RdGy")
+
+colchlorophyll = scale_fill_gradient2(
+  midpoint = 0, mid = "white",
+  low = brewer.pal(8,"Greys")[6],
+  high = brewer.pal(5,"Greens")[5])
+
+```
+
+Cleanup ggplot theme
+
+```{r}
+cleanup = theme_void() + theme(legend.position = "bottom",
+  axis.text.x = element_text(size = 10),
+  legend.title = element_blank(),
+  legend.direction = "horizontal",
+  legend.key.size = unit(8, 'pt'),
+  legend.text = element_text(size = 5, angle = 45, vjust = 1),
+  plot.margin = margin(l = -.5, r = -.5, unit = "cm"))
+```
+
+Generate all plots
+
+```{r}
+p1 = ggplot(restemp, aes(x = variable, y = genus, fill=log2FoldChange)) + 
+  geom_tile(colour = "white", lwd = .5, linetype = 1) +
+  geom_text(aes(label=sign), angle=0, vjust=-.2, colour = "black") + 
+  coltemp + cleanup
+
+p2 = ggplot(ressalinity, aes(x = variable, y = genus, fill=log2FoldChange)) + 
+  geom_tile(colour = "white", lwd = .5, linetype = 1) +
+  geom_text(aes(label=sign), angle=0, vjust=-.2, colour = "black") + 
+  colsalinity + cleanup
+
+p3 = ggplot(resnitrate, aes(x = variable, y = genus, fill=log2FoldChange)) + 
+  geom_tile(colour = "white", lwd = .5, linetype = 1) +
+  geom_text(aes(label=sign), angle=0, vjust=-.2, colour = "black") +
+  colnitrate + cleanup
+
+p4 = ggplot(resoxygen, aes(x = variable, y = genus, fill=log2FoldChange)) + 
+  geom_tile(colour = "white", lwd = .5, linetype = 1) +
+  geom_text(aes(label=sign), angle=0, vjust=-.2, colour = "black") + 
+  coloxygen + cleanup
+
+p5 = ggplot(reschlorophyll, aes(x = variable, y = genus, fill=log2FoldChange)) + 
+  geom_tile(colour = "white", lwd = .5, linetype = 1) +
+  geom_text(aes(label=sign), angle=0, vjust=-.2, colour = "black") + 
+  colchlorophyll +cleanup
+
+```
+
+```{r}
+cowplot::plot_grid(NULL, 
+  p1 + theme(axis.text.y = element_text(size = 6, hjust = 1)), NULL,
+  p2, NULL,  p3, NULL, p4, NULL, p5, 
+  ncol = 10, 
+  align = 'hv', axis  = 'tb', 
+  rel_widths = c(0.4,1,-0.4,1,-0.4,1,-0.4,1,-0.4,1)) %>% 
+  ggplotify::as.ggplot() +
+  labs(#title = "Envrionmental variables correlated with Halieaceae genera abundances.",
+  #  subtitle = "Envrionmental data were obtained from the TARA Ocean data set.\n",
+    #caption = "\nSignificant correlations between genera and chemo-physical properties.\n Correlations were assessed using a negative binomial GLM for each Halieaceae genera.\n Gradients represent the log2 fold change and significance level\nrepresent the pvalue from Wald-test adjusted with the Benjamini−Hochberg procedure."
+    )
+```
+
+```{r}
+ggsave(
+  "fig-4.pdf",
+  plot = last_plot(),
+  device = "pdf",
+  scale = 0.9,
+  width = 10,
+  height = 10,
+  dpi = 300
+)
+```
+
+<https://swilke-geoscience.net/post/spatial_interpolation/>
+
+```{r, eval=FALSE}
+data = mperc_genus #%>%
+  #filter(species == "Halioglobus sp009937575")
+  
+map +
+  geom_point(aes(
+    x = data$longitude, 
+    y = data$latitude,
+    size = data$abundance,
+    colour = data$genus))
+```
+
