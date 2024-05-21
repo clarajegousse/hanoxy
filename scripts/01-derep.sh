@@ -14,7 +14,10 @@ conda activate /hpcapps/env/conda/SNIC # activate conda environment
 WD=$HOME/projects/hanoxy/data/genomes
 OUTDIR=$HOME/projects/hanoxy/results/derep-genomes
 
-coverm cluster --ani 95 --genome-fasta-directory $WD/ --output-representative-fasta-directory $OUTDIR
+# just checking if program runs. 
+coverm -h 
+
+# coverm cluster --ani 95 --genome-fasta-directory $WD/ --output-representative-fasta-directory $OUTDIR
 
 # --- dereplication ----
 
