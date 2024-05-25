@@ -7,6 +7,8 @@
 #SBATCH -N 1
 #SBATCH --ntasks-per-node=1
 
+. ~/.bashrc
+
 ml use /hpcapps/lib-tools/modules/all
 ml load Anaconda3/2023.09-0 # load Anaconda
 conda activate /hpcapps/env/conda/SNIC # activate conda environment
@@ -14,10 +16,7 @@ conda activate /hpcapps/env/conda/SNIC # activate conda environment
 WD=$HOME/projects/hanoxy/data/genomes
 OUTDIR=$HOME/projects/hanoxy/results/derep-genomes
 
-# just checking if program runs. 
-coverm -h 
-
-# coverm cluster --ani 95 --genome-fasta-directory $WD/ --output-representative-fasta-directory $OUTDIR
+coverm cluster --ani 95 --genome-fasta-directory $WD/ --output-representative-fasta-directory $OUTDIR
 
 # --- dereplication ----
 
