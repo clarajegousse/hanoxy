@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=haliea-gen-derep
-#SBATCH -p normal
+#SBATCH -p mimir
 #SBATCH --time=2-00:00:00
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=cat3@hi.is
