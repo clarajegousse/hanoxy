@@ -18,7 +18,7 @@ OUTDIR=$HOME/projects/hanoxy/results/derep-genomes
 
 OUTDIR=$HOME/projects/hanoxy/results/derep-genomes
 
-gzip $WD/*.gz
+gzip -d $WD/*.gz
 
 coverm cluster --ani 95 --genome-fasta-directory $WD/ --output-representative-fasta-directory $OUTDIR
 
