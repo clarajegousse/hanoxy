@@ -16,25 +16,9 @@ conda activate /hpcapps/env/conda/SNIC # activate conda environment
 WD=$HOME/projects/hanoxy/data/genomes
 OUTDIR=$HOME/projects/hanoxy/results/derep-genomes
 
-OUTDIR=$HOME/projects/hanoxy/results/derep-genomes
-
 gzip -d $WD/*.gz
 
-coverm cluster --ani 95 --genome-fasta-directory $WD/ --output-representative-fasta-directory $OUTDIR
-
-# --- dereplication ----
-
-#checkm -h
-#checkm data setRoot /users/work/cat3/db/gtdbk
-#dRep dereplicate $WD/DREP -g $WD/*.fna.gz -d
+coverm cluster --ani 90 --genome-fasta-directory $WD/ --output-representative-fasta-directory $OUTDIR
 
 
-# /users/home/cat3/miniconda3/lib/python3.8/site-packages/statsmodels/tools/_testing.py:19: FutureWarning: pandas.util.testing is deprecated. Use the functions in the public API at pandas.testing instead.
-#   import pandas.util.testing as tm
-# ***************************************************
-#     ..:: dRep dereplicate Step 1. Filter ::..
-# ***************************************************
-#
-# Will filter the genome list
-# 117 genomes were input to dRep
-# Calculating genome info of genomes
+# if --ani 95 = 150 genomes

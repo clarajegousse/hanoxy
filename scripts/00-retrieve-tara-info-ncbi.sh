@@ -16,11 +16,11 @@ cd $WD/data/info
 
 
 # # search for all TARA shotgun bioprojects focusing on prokaryotes
-# esearch -db BioProject -query TARA |\
-#  efetch -format docsum |\
-#  xtract -pattern DocumentSummary -element Project_Acc,Project_Name,Project_Title |\
-#   grep Shotgun | grep prokaryotes
-# # PRJEB9740 PRJEB1787
+esearch -db BioProject -query TARA |\
+ efetch -format docsum |\
+ xtract -pattern DocumentSummary -element Project_Acc,Project_Name,Project_Title |\
+  grep Shotgun | grep prokaryotes
+# PRJEB9740 PRJEB1787
 
  #-block Attributes -subset Attribute -if @attribute_name -equals "sample material label" -element Attribute \
 esearch -db sra -query 'PRJEB9740[BioProject] OR PRJEB1787[BioProject]' |\
@@ -43,9 +43,12 @@ xtract -pattern DocumentSummary -element Biosample | while read -r smp ;
 	  -block Attributes -subset Attribute -if @attribute_name -equals "Oxygen Sensor" -element Attribute \
 	  -block Attributes -subset Attribute -if @attribute_name -equals "Chlorophyll Sensor" -element Attribute \
 	  -block Attributes -subset Attribute -if @attribute_name -equals "Size Fraction Lower Threshold" -element Attribute
-done > biosamples0.txt
+done > biosamples.txt
 
-cat biosamples0.txt | awk 'BEGIN {FS="\t"}; NF>=12 && $NF!=""' > biosamples.txt
+
+# cat biosamples.txt | awk 'BEGIN {FS="\t"}; NF>=12 && $NF!=""' > biosamples.txt
+
+cat biosamples.txt | grep -P '\tTARA_[0-9]{3}\t'
 
 #echo -e "biosample_accession\tplatform\trun_accession\ttotal-reads\ttotal_bases" > runs.txt
 esearch -db sra -query 'PRJEB9740[BioProject] OR PRJEB1787[BioProject]' |\
@@ -83,5 +86,5 @@ cat run-biosamples-infos.txt | grep -v 99999 > selected-run-biosamples-infos.txt
 cat selected-run-biosamples-infos.txt | cut -f 3 | sort | uniq > sra-accessions.txt
 
 # generate the corresponding samples.txt file
-cat selected-run-biosamples-infos.txt | cut -f 3,9 | awk 'BEGIN{print "sample\tr1\tr2"}{print $2 "\t" $1"_1.fastq.gz\t" $1"_2.fastq.gz"}' | sort | uniq > samples.txt
+cat selected-run-biosamples-infos.txt | cut -f 3,10 | awk 'BEGIN{print "sample\tr1\tr2"}{print $2 "\t" $1"_1.fastq.gz\t" $1"_2.fastq.gz"}' | sort | uniq > samples.txt
 #cat samples.txt
