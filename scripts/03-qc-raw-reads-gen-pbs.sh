@@ -29,8 +29,8 @@ do
 #SBATCH --mail-user=cat3@hi.is
 #SBATCH -N 1
 #SBATCH --ntasks-per-node=1
-#SBATCH --output='$sample'-qc-pbs.%j.out
-#SBATCH --error='$sample'-qc-pbs.%j.err
+#SBATCH --output=03-qc-'$sample'.%j.out
+#SBATCH --error==03-qc-'$sample'.%j.err
 
 echo $HOSTNAME
 
@@ -39,6 +39,8 @@ echo $HOSTNAME
 ml use /hpcapps/lib-tools/modules/all
 ml load Anaconda3/2023.09-0 # load Anaconda
 conda activate /hpcapps/env/conda/SNIC # activate conda environment
+
+. ~/.bashrc
 
 WD=$HOME/projects/hanoxy
 cd /hpcdata/Mimir/cat3/raw
