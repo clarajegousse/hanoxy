@@ -17,12 +17,12 @@ RAW_DIR=/hpcdata/Mimir/cat3/raw
 
 iu-gen-configs $WD/data/info/samples.txt -o $WD/results/qc
 
-for sample in `awk '{print $1}' $WD/RAW-READS/samples.txt`
+for sample in `awk '{print $1}' $WD/data/info/samples.txt`
 do
     if [ "$sample" == "sample" ]; then continue; fi
 	echo $sample
 	echo '''#!/bin/bash
-#SBATCH --job-name=qc-'$sample'
+#SBATCH --job-name=03-qc-'$sample'
 #SBATCH -p mimir
 #SBATCH --time=3-00:00:00
 #SBATCH --mail-type=ALL
@@ -33,10 +33,15 @@ do
 #SBATCH --error='$sample'-qc-pbs.%j.err
 
 echo $HOSTNAME
-source /users/home/cat3/.bashrc
-conda activate anvio-master
-WD=/users/home/cat3/projects/haliea
-cd $WD/RAW-READS
-iu-filter-quality-minoche $WD/DATA-SAMPLES/'$sample'.ini --ignore-deflines
+
+. ~/.bashrc
+
+ml use /hpcapps/lib-tools/modules/all
+ml load Anaconda3/2023.09-0 # load Anaconda
+conda activate /hpcapps/env/conda/SNIC # activate conda environment
+
+WD=$HOME/projects/hanoxy
+cd /hpcdata/Mimir/cat3/raw
+iu-filter-quality-minoche $WD/results/qc/'$sample'.ini --ignore-deflines
 ''' > $WD/scripts/$sample'-qc-pbs.sh'
 done
