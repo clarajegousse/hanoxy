@@ -3,19 +3,22 @@
 # prepare files for quality control of the raw metagenomics reads 
 # and generate pbs scripts for scheduler.
 
-# to insure work with python3
-source /users/home/cat3/.bashrc
+source ~/.bashrc
 
 # activate environment
 ml use /hpcapps/lib-tools/modules/all
 ml load Anaconda3/2023.09-0 # load Anaconda
 conda activate /hpcapps/env/conda/SNIC # activate conda environment
+source ~/.bashrc
 
 # go to working directory
 WD=$HOME/projects/hanoxy
 RAW_DIR=/hpcdata/Mimir/cat3/raw
+OUT_DIR=$WD/results/qc
 
-iu-gen-configs $WD/data/info/samples.txt -o $WD/results/qc
+cat $WD/data/info/samples.txt | sed 's+"++g' | sed 's+ERR+/hpcdata/Mimir/cat3/raw/ERR+g' > $WD/data/info/samples-paths.txt
+
+iu-gen-configs $WD/data/info/samples-paths.txt -o $OUT_DIR
 
 for sample in `awk '{print $1}' $WD/data/info/samples.txt`
 do
@@ -30,20 +33,19 @@ do
 #SBATCH -N 1
 #SBATCH --ntasks-per-node=1
 #SBATCH --output=03-qc-'$sample'.%j.out
-#SBATCH --error==03-qc-'$sample'.%j.err
+#SBATCH --error=03-qc-'$sample'.%j.err
 
 echo $HOSTNAME
-
-. ~/.bashrc
 
 ml use /hpcapps/lib-tools/modules/all
 ml load Anaconda3/2023.09-0 # load Anaconda
 conda activate /hpcapps/env/conda/SNIC # activate conda environment
+source ~/.bashrc
 
-. ~/.bashrc
+# iu-filter-quality-minoche /hpchome/cat3/projects/hanoxy/results/qc/TARA_030.ini --ignore-deflines
+iu-filter-quality-minoche /hpchome/cat3/projects/hanoxy/results/qc/'$sample'.ini --ignore-deflines
+gzip /hpchome/cat3/projects/hanoxy/results/qc/'$sample'-QUALITY_PASSED_R1.fastq
+gzip /hpchome/cat3/projects/hanoxy/results/qc/'$sample'-QUALITY_PASSED_R2.fastq
 
-WD=$HOME/projects/hanoxy
-cd /hpcdata/Mimir/cat3/raw
-iu-filter-quality-minoche $WD/results/qc/'$sample'.ini --ignore-deflines
-''' > $WD/scripts/$sample'-qc-pbs.sh'
+''' > $WD/scripts/03-qc-$sample-pbs.sh
 done

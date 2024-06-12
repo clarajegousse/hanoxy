@@ -22,4 +22,5 @@ gzip -d $WD/*.gz
 
 coverm cluster --ani 90 --genome-fasta-directory $WD/ --output-representative-fasta-directory $OUTDIR
 
+# gtdb = 155
 # if --ani 95 = 150 genomes
