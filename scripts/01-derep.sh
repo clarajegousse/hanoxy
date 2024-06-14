@@ -1,13 +1,13 @@
 #!/bin/bash
 #SBATCH --job-name=01-derep
+#SBATCH --output=01-derep.%j.out
+#SBATCH --error=01-derep.%j.err
 #SBATCH -p mimir
 #SBATCH --time=2-00:00:00
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=cat3@hi.is
 #SBATCH -N 1
 #SBATCH --ntasks-per-node=1
-#SBATCH --output=%j-%x.out
-#SBATCH --error=%j-%x.out
 
 . ~/.bashrc
 
