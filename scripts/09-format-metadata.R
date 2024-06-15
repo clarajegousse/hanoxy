@@ -1,11 +1,10 @@
-library(rgeos)
 library(sf) # World map
 library(rnaturalearth)
 library(ggplot2)
 library(devtools)
 library(dplyr)
 library(plyr)
-
+library(here)
 
 # set the directory to save img
 img.path = "/Users/Clara/Projects/haliea/FIG/"
@@ -22,8 +21,10 @@ map <- ggplot() +
   theme(panel.grid.major = element_line(color = lightgrey, linetype = "dashed", size = 0.5))
 map
 
+longhurst_file = paste(here(), '/data/longhurst/longhurst-world-v4-2010.shx', sep = "")
+
 # import longhurst provinces
-longhurst <- sf::read_sf("/Users/Clara/Projects/haliea/INFOS/longhurst-world-v4-2010.shx")
+longhurst <- sf::read_sf(longhurst_file)
 names(longhurst)
 head(longhurst)
 
@@ -42,7 +43,8 @@ map + geom_sf(data = longhurst, aes(fill = ProvCode), size = .1, col = "white", 
                colour = DarkGrey, size = 3, check_overlap = TRUE) +
   coord_sf(expand = FALSE) + labs(x = 'longitude', y = 'latitude')
 
-df <- read.csv("/Users/Clara/Projects/haliea/INFOS/selected-run-biosamples-infos.txt", 
+biosamples_infos = paste(here(), '/data/info/selected-run-biosamples-infos.txt', sep = "")
+df <- read.csv(biosamples_infos, 
                sep = "\t", dec = ".", header = FALSE)
 df
 head(df)
