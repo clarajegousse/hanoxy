@@ -1,6 +1,6 @@
 __default__:
   job-name: "{rule}-{wildcards}"
-  queue: "normal"
+  queue: "mimir"
   time: "3-00:00:00"
   email_type: "ALL"
   email: "cat3@hi.is"

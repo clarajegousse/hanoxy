@@ -21,9 +21,9 @@ library(dplyr)
 library(tidyr)
 library(reshape)
 library(stringr)
+library(here)
 
 # maps and geography
-library(rgeos)
 library(sf) # World map
 library(rnaturalearth)
 
@@ -45,8 +45,8 @@ library(DESeq2)
 The metadata contains information about the samples, such as the sampling date, the Longhurst region, the biome, GPS locations, and measurements like the temperature, salinity, oxygen, etc.
 
 ```{r}
-meta <- read.csv("/Users/jegoussc/Repositories/hanoxy/data/info/metadata.csv", 
-  sep = ',')
+file = paste(here(), "/data/info/metadata.csv", sep = "")
+meta <- read.csv(file, sep = ',')
 
 meta$sampling_date = as.Date(meta$sampling_date)
 # head(meta)
@@ -105,7 +105,8 @@ Data set was downloaded from <https://www.marineregions.org/downloads.php>.
 
 ```{r}
 # import longhurst provinces
-longhurst <- sf::read_sf("/Users/jegoussc/Repositories/haliea/INFOS/longhurst-world-v4-2010.shx")
+file = paste(here(), "/data/longhurst/longhurst-world-v4-2010.shx", sep = "")
+longhurst <- sf::read_sf(file)
 ```
 
 Draw the blank world map with the Longhurst provinces.
@@ -218,7 +219,12 @@ meta %>%
 ## Genomes
 
 ```{r}
-gtdb_info = read.delim("/Users/jegoussc/Repositories/hanoxy/data/info/haliea-gtdb.tsv")
+file = paste(here(), "/data/info/haliea-gtdb.tsv", sep = "")
+gtdb_info = read.delim(file)
+
+colnames(gtdb_info) = c("id", "ncbi_organism_name", "ncbi_taxo", 
+                        "gtdb_taxo", "gtdb_sp_representative", "gtdb_type_mat")
+
 genome_info = gtdb_info %>% separate(data = ., col = ncbi_taxo, 
   into = c('ncbi_domain', 'ncbi_phylum', 'ncbi_class', 'ncbi_order', 'ncbi_family', 'ncbi_genus', 'ncbi_species'), 
   sep = ";") %>%

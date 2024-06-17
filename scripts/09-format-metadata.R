@@ -35,6 +35,16 @@ longhurst <- longhurst %>%
   dplyr::summarise()
 #plot(longhurst)
 
+longhurst %>% filter(stringr::str_detect(ProvDescr, "Westerlies"))
+
+#longh = data.frame(
+#  longhurst_code = longhurst$ProvCode, 
+#  province_name = str_split(longhurst$ProvDescr, pattern = " - ", simplify = TRUE)[,2],
+#  biome = str_split(longhurst$ProvDescr, pattern = " - ", simplify = TRUE)[,1])
+
+file = paste(here(), '/data/longhurst/longhurst_provinces.txt', sep = "")
+longh = read.table(file)
+
 # draw map with Longhurst provinces
 map + geom_sf(data = longhurst, aes(fill = ProvCode), size = .1, col = "white", alpha = .25) +
   ggtitle(paste("Longhurst Biogeochemical Provinces -", length(unique(longhurst$ProvCode)),"provinces")) +
@@ -45,7 +55,7 @@ map + geom_sf(data = longhurst, aes(fill = ProvCode), size = .1, col = "white", 
 
 biosamples_infos = paste(here(), '/data/info/selected-run-biosamples-infos.txt', sep = "")
 df <- read.csv(biosamples_infos, 
-               sep = "\t", dec = ".", header = FALSE)
+               sep = "\t", dec = ".", header = FALSE, na.strings = "NA")
 df
 head(df)
 
@@ -53,7 +63,15 @@ colnames(df) <- c("biosample_accession", "sequencing_platform", "run_accession",
                   "total_reads", "total_counts", "library_strategy", "sample_alias",
                   "taxid", "station_name", "sampling_date", "latitude", "longitude", "depth", 
                   "temperature", "salinity", "nitrate", "oxygen", "chlorophyll", "lower_size_fraction")
-df <- unique(df)
+df <- unique(df) %>% filter(depth <= 5)
+df <- df %>%
+  mutate(
+    latitude = as.numeric(latitude),
+    longitude = as.numeric(as.character(longitude))
+  )
+
+#df = df %>% filter(stringr::str_detect(station_name, "MIME_001"))
+# df %>% filter(stringr::str_detect(station_name, "TARA_173"))
 
 map + geom_sf(data = longhurst, aes(fill = ProvCode), size = .1, col = "white", alpha=.4) +
   #scale_fill_manual(values = col$value) +
@@ -104,7 +122,7 @@ df[df$station_name == 'TARA_124',]$longhurst_region <- "SPSG"
 df[df$station_name == 'TARA_125',]$longhurst_region <- "SPSG"
 df[df$station_name == 'TARA_128',]$longhurst_region <- "PEQD"
 df[df$station_name == 'TARA_132',]$longhurst_region <- "NPTG"
-df[df$station_name == 'TARA_133',]$longhurst_region <- "CCAL"
+df[df$station_name == 'TARA_133',]$longhurst_region <- "NPPF"
 df[df$station_name == 'TARA_137',]$longhurst_region <- "NPTG"
 df[df$station_name == 'TARA_138',]$longhurst_region <- "PNEC"
 df[df$station_name == 'TARA_140',]$longhurst_region <- "CAMR"
@@ -131,12 +149,10 @@ df[df$station_name == 'TARA_206',]$longhurst_region <- "BPLR"
 df[df$station_name == 'TARA_208',]$longhurst_region <- "BPLR"
 df[df$station_name == 'TARA_209',]$longhurst_region <- "BPLR"
 df[df$station_name == 'TARA_210',]$longhurst_region <- "ARCT"
-
-
-longh <- read.csv("/Users/Clara/Projects/haliea/INFOS/longhurst_regions.tsv", sep = '\t')
+df[df$station_name == 'MIME_001',]$longhurst_region <- "ARCT"
+df[df$station_name == 'MIME_002',]$longhurst_region <- "SARC"
 
 df <- merge(df, longh, by.x = 'longhurst_region', by.y = 'longhurst_code')
-
 
 df <- df %>%
   group_by(station_name, sampling_date, longhurst_region, province_name, ocean, biome, latitude, longitude, depth, temperature, salinity, nitrate, oxygen, chlorophyll) %>%
@@ -145,7 +161,8 @@ mtdt.df <- as.data.frame(df)
 rownames(mtdt.df) <- mtdt.df$station_name
 
 # write a csv file
-write.table(mtdt.df, file = "/Users/Clara/Projects/haliea/INFOS/metadata.csv", sep = ",",
+output_file = paste(here(), "/data/info/metadata.csv", sep = "")
+write.table(mtdt.df, file = output_file, sep = ",",
             na = "NA", dec = ".")
 
 map +  geom_sf(data = longhurst, aes(fill = ProvCode), size = .1, col = "white", alpha = .25) +

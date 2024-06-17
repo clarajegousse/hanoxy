@@ -1,0 +1,58 @@
+longhurst_code	province_name	ocean	biome
+FKLD	Southwest Atlantic shelves	Atlantic	Coastal
+BRAZ	Brazilian current coast	Atlantic	Coastal
+BENG	Benguela current coast	Atlantic	Coastal
+GUIN	Guinea current coast	Atlantic	Coastal
+CNRY	Canary current coast	Atlantic	Coastal
+GUIA	Guianas coast	Atlantic	Coastal
+NECS	Northeast Atlantic shelves	Atlantic	Coastal
+NWCS	Northwest Atlantic shelves	Atlantic	Coastal
+ARCT	Atlantic Arctic	Atlantic	Polar
+SARC	Atlantic sub-Arctic	Atlantic	Polar
+SATL	South Atlantic gyral	Atlantic	Trade wind
+ETRA	Eastern tropical Atlantic	Atlantic	Trade wind
+WTRA	Western tropical Atlantic	Atlantic	Trade wind
+CARB	Caribbean	Atlantic	Trade wind
+NATR	North Atlantic tropical gyral	Atlantic	Trade wind
+NAST E	Northeast Atlantic subtropical gyral	Atlantic	Westerly
+MEDI	Mediterranean Sea	Atlantic	Westerly
+NAST W	Northwest Atlantic subtropical gyral	Atlantic	Westerly
+GFST	Gulf Stream	Atlantic	Westerly
+NADR	North Atlantic Drift	Atlantic	Westerly
+HUMB	Humboldt current coast	Pacific	Coastal
+AUSE	East Australian coast	Pacific	Coastal
+SUND	Sunda-Arafura shelves	Pacific	Coastal
+CHIN	China Sea	Pacific	Coastal
+CAMR	Central American coast	Pacific	Coastal
+ALSK	Alaska coastal downwelling	Pacific	Coastal
+NEWZ	New Zealand coast	Pacific	Coastal
+CCAL	Coastal Californian current	Pacific	Coastal
+BERS	North Pacific epicontinental sea	Pacific	Polar
+ARCH	Archipelagic deep basins	Pacific	Trade wind
+PEQD	Pacific equatorial divergence	Pacific	Trade wind
+PNEC	North Pacific equatorial counter current	Pacific	Trade wind
+NPTG	North Pacific Tropical gyre	Pacific	Trade wind
+C(O)CAL	California current	Pacific	Trade wind
+SPSG	South Pacific gyre	Pacific	Trade wind
+WARM	Western Pacific warm pool	Pacific	Trade wind
+TASM	Tasman Sea	Pacific	Westerly
+KURO	Kuroshio current	Pacific	Westerly
+PSAE	Eastern Pacific subarctic gyres	Pacific	Westerly
+PSAW	Western Pacific subarctic gyres	Pacific	Westerly
+NPPF	North Pacific polar front	Pacific	Westerly
+NPSW	Northwest Pacific subtropical	Pacific	Westerly
+NPSE	Northeast Pacific subtropical	Pacific	Westerly
+CHIL	Chile-Peru Current Coastal	Pacific	Coastal
+EAFR	East African coast	Indian	Coastal
+AUSW	Western Australian and Indonesian coast	Indian	Coastal
+INDE	Eastern India coast	Indian	Coastal
+REDS	Red Sea, Persian Gulf	Indian	Coastal
+INDW	Western India coast	Indian	Coastal
+ISSG	Indian South subtropical gyre	Indian	Trade wind
+MONS	Indian monsoon gyre	Indian	Trade wind
+ARAB	Northwest Arabian Sea upwelling	Indian	Westerly
+SSTC	South subtropical convergence	Antarctic	Westerly
+SANT	Subantarctic water ring	Antarctic	Westerly
+ANTA	Antarctic	Antarctic	Polar
+APLR	Austral polar	Antarctic	Polar
+BPRL	Boreal polar	Arctic	Polar

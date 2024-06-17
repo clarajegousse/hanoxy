@@ -1,6 +1,6 @@
-scratch_dir: '/Users/jegoussc/Repositories/hanoxy'
+scratch_dir: '/hpchome/cat3/project/hanoxy'
 #scratch_dir: '/users/home/cat3/projects/hanoxy'
 samples_file_info: '/data/info/samples.txt'
-raw_data_dir: '/data/raw'
+raw_data_dir: '/hpcdata/Mimir/cat3/raw'
 res_dir: '/results'
 qc_res_dir: '/results/qc'

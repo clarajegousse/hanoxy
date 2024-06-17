@@ -22,8 +22,8 @@ esearch -db BioProject -query TARA |\
   grep Shotgun | grep prokaryotes
 # PRJEB9740 PRJEB1787
 
- #-block Attributes -subset Attribute -if @attribute_name -equals "sample material label" -element Attribute \
-esearch -db sra -query 'PRJEB9740[BioProject] OR PRJEB1787[BioProject]' |\
+#-block Attributes -subset Attribute -if @attribute_name -equals "sample material label" -element Attribute \
+esearch -db sra -query 'PRJEB41565[BioProject]' |\
 efetch -format docsum |\
 xtract -pattern DocumentSummary -element Biosample | while read -r smp ;
  do
@@ -44,7 +44,6 @@ xtract -pattern DocumentSummary -element Biosample | while read -r smp ;
 	  -block Attributes -subset Attribute -if @attribute_name -equals "Chlorophyll Sensor" -element Attribute \
 	  -block Attributes -subset Attribute -if @attribute_name -equals "Size Fraction Lower Threshold" -element Attribute
 done > biosamples.txt
-
 
 # cat biosamples.txt | awk 'BEGIN {FS="\t"}; NF>=12 && $NF!=""' > biosamples.txt
 
@@ -71,16 +70,20 @@ sort wgs-runs.txt > sorted-wgs-runs.txt
 # select biosamples from the surface seawater (above 10m deep) and
 # with lower size fractions of 0.22um to target prokaryotes
 cat biosamples.txt | awk '$8 < 10 && $14 == 0.22' > srf-biosamples.txt
-cat biosamples.txt | grep '5 m' | grep '0.22' > srf-biosamples.txt
+cat biosamples.txt | grep '5 m\|5m' | grep '0.22' > srf-biosamples.txt
 sort srf-biosamples.txt | uniq > sorted-srf-biosamples.txt
 
-join sorted-wgs-runs.txt sorted-srf-biosamples.txt | sed -e 's/ /\t/g' > run-biosamples-infos.txt
+join sorted-wgs-runs.txt sorted-srf-biosamples.txt | sed -e 's/5 m/5m/i' | sed -e 's/ /\t/g' > run-biosamples-infos.txt
+
 
 # select biosamples without missing data (99999) and at latitude above 10 degree north
 # cat run-biosamples-infos.txt | grep -v 99999 |  awk '$11 > 10' > selected-run-biosamples-infos.txt
 
+echo -e """SAMEA7725442	Illumina HiSeq 4000	ERR5001722	33490414	5023562100	WGS	20170521_SI8_313_0m	408172	MIME_001	2017-05-21	68.0094	−18.8325	0	2.700	34.914	NA	NA	NA 0.22
+SAMEA7725446	Illumina HiSeq 4000	ERR5006263	33065000	4959750000	WGS	20170530_SB5_429_0m	408172	MIME_002	2017-05-30	62.9878	-21.48	0	8.477	34.761	NA	NA	NA 0.22""" > mime-samples.txt
+
 # all samples worldwide
-cat run-biosamples-infos.txt | grep -v 99999 > selected-run-biosamples-infos.txt
+cat run-biosamples-infos.txt mime-samples.txt | grep -v 99999 > selected-run-biosamples-infos.txt
 
 # generate the list of sra accession numbers
 cat selected-run-biosamples-infos.txt | cut -f 3 | sort | uniq > sra-accessions.txt

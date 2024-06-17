@@ -2,7 +2,7 @@ import helpers as hlp
 
 configfile: "config.yaml"
 
-SAMPLE = 'TARA_096'
+SAMPLE = 'TARA_030'
 
 FILE = config['scratch_dir'] + config['samples_file_info']
 RUNS = hlp.sample2runs(SAMPLE, FILE)
