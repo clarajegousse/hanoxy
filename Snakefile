@@ -29,7 +29,7 @@ rule download_ena:
         ftp = lambda wildcard: hlp.run2url(wildcard),
         outdir = RAW_DATA_DIR + '/{sample}'
     output:
-        # /users/home/cat3/projects/hanoxy/data/raw/TARA_030/ERR315862_1.fastq.gz
+        # /hpchome/cat3/projects/hanoxy/data/raw/TARA_030/ERR315862_1.fastq.gz
         RAW_DATA_DIR + '/{sample}/{run}_{num}.fastq.gz'
     shell:
      """
@@ -41,7 +41,7 @@ rule download_ena:
 
 rule qc_ini:
     input:
-        # /users/home/cat3/projects/hanoxy/data/raw/TARA_030/ERR315862_1.fastq.gz
+        # /hpchome/cat3/projects/hanoxy/data/raw/TARA_030/ERR315862_1.fastq.gz
         expand(RAW_DATA_DIR + '/{sample}/{run}_{num}.fastq.gz', sample = SAMPLE, run = RUNS, num = NUM)
     params:
         info = hlp.ui_config(SAMPLE, RUNS, RAW_DATA_DIR),
@@ -91,9 +91,9 @@ rule abundance:
     input:
         r1 = expand(QC_RES_DIR + '/{sample}-QUALITY_PASSED_R1.fastq.gz', sample = SAMPLE),
         r2 = expand(QC_RES_DIR + '/{sample}-QUALITY_PASSED_R2.fastq.gz', sample = SAMPLE),
-        derep_dir = "/users/home/cat3/projects/hanoxy/results/derep-genomes"
+        derep_dir = "/hpchome/cat3/projects/hanoxy/results/derep-genomes"
     output:
-        abundance = expand('/users/home/cat3/projects/hanoxy/results/abundance/{sample}.tsv', sample = SAMPLE)
+        abundance = expand('/hpchome/cat3/projects/hanoxy/results/abundance/{sample}.tsv', sample = SAMPLE)
     shell:
         """
         coverm genome -1 {input.r1} \
@@ -109,9 +109,9 @@ rule tpm:
     input:
         r1 = expand(QC_RES_DIR + '/{sample}-QUALITY_PASSED_R1.fastq.gz', sample = SAMPLE),
         r2 = expand(QC_RES_DIR + '/{sample}-QUALITY_PASSED_R2.fastq.gz', sample = SAMPLE),
-        derep_dir = "/users/home/cat3/projects/hanoxy/results/derep-genomes"
+        derep_dir = "/hpchome/cat3/projects/hanoxy/results/derep-genomes"
     output:
-        tpm = expand('/users/home/cat3/projects/hanoxy/results/tpm/{sample}.tsv', sample = SAMPLE)
+        tpm = expand('/hpchome/cat3/projects/hanoxy/results/tpm/{sample}.tsv', sample = SAMPLE)
     shell:
         """
         coverm genome -1 {input.r1} \

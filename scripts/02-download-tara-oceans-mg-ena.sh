@@ -34,8 +34,10 @@ https://ftp.sra.ebi.ac.uk/vol1/fastq/ERR315/ERR315863/ERR315863_1.fastq.gz
 cat $WD/data/info/sra-accessions.txt | while read -r acc
 do
 	echo $acc
+	echo"""
 	wget "ftp://ftp.sra.ebi.ac.uk/vol1/fastq/"${acc:0:6}"/"$acc"/"$acc"_1.fastq.gz"
 	wget "ftp://ftp.sra.ebi.ac.uk/vol1/fastq/"${acc:0:6}"/"$acc"/"$acc"_2.fastq.gz"
+	"""
 done
 
 mv -r $WD/data/raw/ /hpcdata/Mimir/cat3/raw
