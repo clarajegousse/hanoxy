@@ -1,3 +1,10 @@
+. ~/.bashrc
+
+ml use /hpcapps/lib-tools/modules/all
+ml load Anaconda3/2023.09-0 # load Anaconda
+conda activate /hpcapps/env/conda/SNIC # activate conda environment
+
+
 if [ -z "$1" ]
 then
     sbatch -p normal -t 92:00:00 -J snake \
