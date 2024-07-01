@@ -18,15 +18,11 @@ cd $WD/data/raw
 
 # ENA sra structure
 
-ERR315862_1.fastq.gz
 # ftp://ftp.sra.ebi.ac.uk/vol1/fastq/<accession-prefix>/<full-accession>/
 # ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR358/000/ERR3589559/ERR3589559_1.fastq.gz
 # ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR599/ERR599077/ERR599077_1.fastq.gz
-
 # https://ftp.sra.ebi.ac.uk/vol1/fastq/ERR358/006/ERR3589556/ERR3589556_1.fastq.gz
-
-
-https://ftp.sra.ebi.ac.uk/vol1/fastq/ERR315/ERR315863/ERR315863_1.fastq.gz
+# https://ftp.sra.ebi.ac.uk/vol1/fastq/ERR315/ERR315863/ERR315863_1.fastq.gz
 
 # ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR358/006/ERR3589556/ERR3589556_1.fastq.gz
 
@@ -40,4 +36,4 @@ do
 	"""
 done
 
-mv -r $WD/data/raw/ /hpcdata/Mimir/cat3/raw
+mv $WD/data/raw/* /hpcdata/Mimir/cat3/raw

@@ -1,0 +1,4 @@
+wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR598/ERR598942/ERR598942_1.fastq.gz
+wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR598/ERR598942/ERR598942_2.fastq.gz
+wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR598/ERR598943/ERR598943_1.fastq.gz
+wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR598/ERR598943/ERR598943_2.fastq.gz
