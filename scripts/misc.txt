@@ -1,4 +1,8 @@
-wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR598/ERR598942/ERR598942_1.fastq.gz
-wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR598/ERR598942/ERR598942_2.fastq.gz
-wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR598/ERR598943/ERR598943_1.fastq.gz
-wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR598/ERR598943/ERR598943_2.fastq.gz
+sample=TARA_031
+
+
+scp -i ~/.ssh/id_name_ihpc cat3@elja.hi.is:/hpchome/cat3/projects/hanoxy/results/abundance/$sample.tsv /Users/clara/Documents/GitHub/hanoxy/results/abundance
+
+scp -i  ~/.ssh/id_name_ihpc cat3@elja.hi.is:/hpchome/cat3/projects/hanoxy/results/counts/$sample.tsv /Users/clara/Documents/GitHub/hanoxy/results/counts 
+
+scp -i  ~/.ssh/id_name_ihpc cat3@elja.hi.is:/hpchome/cat3/projects/hanoxy/results/qc/$sample-STATS.txt /Users/clara/Documents/GitHub/hanoxy/results/qc/
