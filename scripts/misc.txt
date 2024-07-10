@@ -1,4 +1,4 @@
-sample=TARA_031
+sample=TARA_032
 
 
 scp -i ~/.ssh/id_name_ihpc cat3@elja.hi.is:/hpchome/cat3/projects/hanoxy/results/abundance/$sample.tsv /Users/clara/Documents/GitHub/hanoxy/results/abundance
@@ -6,3 +6,9 @@ scp -i ~/.ssh/id_name_ihpc cat3@elja.hi.is:/hpchome/cat3/projects/hanoxy/results
 scp -i  ~/.ssh/id_name_ihpc cat3@elja.hi.is:/hpchome/cat3/projects/hanoxy/results/counts/$sample.tsv /Users/clara/Documents/GitHub/hanoxy/results/counts 
 
 scp -i  ~/.ssh/id_name_ihpc cat3@elja.hi.is:/hpchome/cat3/projects/hanoxy/results/qc/$sample-STATS.txt /Users/clara/Documents/GitHub/hanoxy/results/qc/
+
+
+#wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR599/ERR599049/ERR599049_1.fastq.gz
+wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR599/ERR599049/ERR599049_2.fastq.gz
+wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR599/ERR599134/ERR599134_1.fastq.gz
+wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR599/ERR599134/ERR599134_2.fastq.gz
