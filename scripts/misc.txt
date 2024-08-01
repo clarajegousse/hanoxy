@@ -1,4 +1,4 @@
-sample=TARA_042
+sample=TARA_067
 
 
 scp -i ~/.ssh/id_name_ihpc cat3@elja.hi.is:/hpchome/cat3/projects/hanoxy/results/abundance/$sample.tsv /Users/clara/Documents/GitHub/hanoxy/results/abundance
@@ -7,12 +7,16 @@ scp -i  ~/.ssh/id_name_ihpc cat3@elja.hi.is:/hpchome/cat3/projects/hanoxy/result
 
 scp -i  ~/.ssh/id_name_ihpc cat3@elja.hi.is:/hpchome/cat3/projects/hanoxy/results/qc/$sample-STATS.txt /Users/clara/Documents/GitHub/hanoxy/results/qc/
 
-wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR599/ERR599045/ERR599045_1.fastq.gz
-wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR599/ERR599045/ERR599045_2.fastq.gz
 
-wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR599/ERR599054/ERR599054_1.fastq.gz
-wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR599/ERR599054/ERR599054_2.fastq.gz
+# "ERR599135_1.fastq.gz,ERR599165_1.fastq.gz"
 
 WD=$HOME/projects/hanoxy
 cd $WD/data/raw
+
+wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR599/ERR599135/ERR599135_1.fastq.gz
+wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR599/ERR599135/ERR599135_2.fastq.gz
+
+wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR599/ERR599165/ERR599165_1.fastq.gz
+wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR599/ERR599165/ERR599165_1.fastq.gz
+
 mv $WD/data/raw/* /hpcdata/Mimir/cat3/raw
